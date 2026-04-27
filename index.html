@@ -1,0 +1,549 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFF8F1;--card:#fff;--br:#6B4F3F;--be:#EAD8C0;--pe:#D99A7A;--bl:#F3C6B8;--mu:#9C7C6E;--tx:#3A2A20;--su:#6F8F72;--wa:#D8A23A;--da:#C94C4C}
+body{background:var(--bg);font-family:system-ui,sans-serif;color:var(--tx);font-size:12px}
+.wrap{padding:10px}
+.hdr{background:#fff;border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;border:1px solid var(--bl);flex-wrap:wrap}
+.brand{font-size:19px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:1px}
+.hdr-mid{flex:1;font-size:10px;color:var(--mu)}
+.fb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.fl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+.db{font-size:10px;padding:4px 10px;border-radius:20px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;white-space:nowrap}
+.db.act{background:var(--br);color:#fff;border-color:var(--br)}
+input[type=date]{font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);font-family:inherit;cursor:pointer;outline:none}
+.sep{color:var(--be)}
+.ab{font-size:10px;padding:4px 12px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer;font-weight:600}
+.cp{font-size:10px;padding:4px 11px;border-radius:20px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600}
+.cp.act{background:var(--pe);color:#fff;border-color:var(--pe)}
+.fn{font-size:9px;color:var(--mu)}
+.tabs{display:flex;gap:4px;margin-bottom:8px}
+.tab{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--be);background:#fff;color:var(--mu)}
+.tab.act{background:var(--br);color:#fff;border-color:var(--br)}
+.panel{display:none}.panel.act{display:block}
+.row{display:grid;gap:8px;margin-bottom:8px}
+.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.r211{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
+.r31{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+.r22{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.c{background:#fff;border-radius:12px;padding:11px 13px;border:1px solid rgba(217,154,122,0.18)}
+.lbl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:3px}
+.val{font-size:22px;font-weight:700;color:var(--br);line-height:1}
+.sub{font-size:10px;color:var(--mu);margin-top:4px;display:flex;align-items:center;gap:5px}
+.pill{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700}
+.pg{background:#E8F3E9;color:var(--su)}.pw{background:#FDF3E0;color:var(--wa)}.pr{background:#FCE8E8;color:var(--da)}
+.bt{background:var(--bl);border-radius:4px;height:5px;margin-top:6px;overflow:hidden}
+.bf{height:100%;background:var(--pe);border-radius:4px;transition:width 0.3s}
+.sl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:6px}
+.leg{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:10px}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.sr{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.sn{flex:1;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st2{width:48px;background:var(--bl);border-radius:3px;height:4px;flex-shrink:0}
+.sf2{height:100%;background:var(--pe);border-radius:3px}
+.sv{font-size:10px;color:var(--br);font-weight:700;width:40px;text-align:right;flex-shrink:0}
+.sp{font-size:9px;color:var(--mu);width:32px;text-align:right;flex-shrink:0}
+.ir{display:flex;gap:5px;margin-bottom:5px;align-items:flex-start}
+.id{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.it{font-size:10px;line-height:1.4}
+.isec{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:3px;margin-top:7px}
+.krow{display:flex;flex-direction:column;gap:3px;margin-top:7px}
+.kline{display:flex;justify-content:space-between;font-size:9px}
+select{font-size:10px;font-family:inherit;padding:3px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;outline:none}
+.ch-badge{display:inline-block;font-size:9px;padding:2px 8px;border-radius:10px;font-weight:700;margin-bottom:6px}
+</style>
+
+<div class="wrap">
+<div class="hdr">
+  <div class="brand">bébé</div>
+  <div class="hdr-mid">E-commerce Performance · April 2026</div>
+  <span style="font-size:9px;color:var(--mu);background:var(--bg);padding:3px 9px;border-radius:20px;border:1px solid var(--be)">Apr 10–27, 2026</span>
+</div>
+
+<div class="fb">
+  <span class="fl">Ngày:</span>
+  <button class="db act" onclick="setPreset('all',this)">Tất cả</button>
+  <button class="db" onclick="setPreset('w1',this)">10–16/4</button>
+  <button class="db" onclick="setPreset('w2',this)">17–23/4</button>
+  <button class="db" onclick="setPreset('w3',this)">24–27/4</button>
+  <input type="date" id="d-from" value="2026-04-10" onchange="clearPreset()">
+  <span class="sep">→</span>
+  <input type="date" id="d-to" value="2026-04-27" onchange="clearPreset()">
+  <button class="ab" onclick="applyFilters()">Áp dụng</button>
+</div>
+<div class="fb">
+  <span class="fl">Kênh:</span>
+  <button class="cp act" onclick="setCh('all',this)">Tất cả</button>
+  <button class="cp" onclick="setCh('Shopee',this)">Shopee</button>
+  <button class="cp" onclick="setCh('Facebook',this)">Facebook</button>
+  <button class="cp" onclick="setCh('Tiktok',this)">TikTok</button>
+  <span class="fn" id="fn">Tất cả ngày · Tất cả kênh</span>
+</div>
+
+<div class="tabs">
+  <div class="tab act" onclick="switchTab('ov',this)">Overview</div>
+  <div class="tab" onclick="switchTab('sku',this)">SKU Performance</div>
+</div>
+
+<!-- OVERVIEW -->
+<div class="panel act" id="tab-ov">
+  <div class="row r4">
+    <!-- GMV -->
+    <div class="c">
+      <div class="lbl">Total GMV</div>
+      <div class="val" id="k-gmv">—</div>
+      <div class="sub"><span class="pill pw" id="k-pct">—</span></div>
+      <div class="bt"><div class="bf" id="k-bar" style="width:0%"></div></div>
+      <div style="font-size:9px;color:var(--mu);margin-top:4px">Target: <span id="k-tgt">—</span></div>
+    </div>
+    <!-- ORDERS -->
+    <div class="c">
+      <div class="lbl">Tổng đơn hàng</div>
+      <div class="val" id="k-ord">—</div>
+      <div class="sub"><span class="pill pw" id="k-apd">—</span></div>
+      <div style="display:flex;gap:6px;margin-top:7px">
+        <div style="flex:1;background:var(--bg);border-radius:6px;padding:5px 8px">
+          <div style="font-size:8px;color:var(--mu)">Ngày cao nhất</div>
+          <div style="font-size:14px;font-weight:700;color:var(--br)" id="k-pk">—</div>
+          <div style="font-size:8px;color:var(--mu)" id="k-pkd">—</div>
+        </div>
+        <div style="flex:1;background:var(--bg);border-radius:6px;padding:5px 8px">
+          <div style="font-size:8px;color:var(--mu)">TB/ngày</div>
+          <div style="font-size:14px;font-weight:700;color:var(--br)" id="k-avg">—</div>
+          <div style="font-size:8px;color:var(--mu)">ngày có đơn</div>
+        </div>
+      </div>
+    </div>
+    <!-- AOV -->
+    <div class="c">
+      <div class="lbl">AOV trung bình</div>
+      <div class="val" id="k-aov">—</div>
+      <div class="sub"><span class="pill pg" id="k-aov-pill">—</span></div>
+      <div class="krow" id="k-aov-detail"></div>
+    </div>
+    <!-- EXTRA: CR / Ads / Visitor tuỳ kênh -->
+    <div class="c">
+      <div class="lbl" id="k-extra-lbl">Chỉ số kênh</div>
+      <div class="val" id="k-extra-val">—</div>
+      <div class="sub" id="k-extra-sub"></div>
+      <div class="krow" id="k-extra-detail"></div>
+    </div>
+  </div>
+
+  <div class="row r211">
+    <div class="c">
+      <div class="sl">% Đóng góp kênh</div>
+      <div style="position:relative;height:130px;display:flex;align-items:center;justify-content:center">
+        <canvas id="dc" role="img" aria-label="Donut kênh">Shopee, Facebook, TikTok</canvas>
+      </div>
+      <div style="margin-top:6px">
+        <div class="leg"><div class="ld" style="background:#D99A7A"></div><span style="flex:1">Shopee</span><b id="dl-sp">—</b></div>
+        <div class="leg"><div class="ld" style="background:#6B4F3F"></div><span style="flex:1">Facebook</span><b id="dl-fb">—</b></div>
+        <div class="leg"><div class="ld" style="background:#F3C6B8"></div><span style="flex:1">TikTok</span><b id="dl-tt">—</b></div>
+        <div style="font-size:8px;color:var(--mu);margin-top:4px;padding:3px 6px;background:var(--bg);border-radius:4px">Website: chưa có dữ liệu</div>
+      </div>
+    </div>
+    <div class="c">
+      <div class="sl">Daily GMV vs Target <span id="cr" style="font-weight:400;color:var(--mu)"></span></div>
+      <div style="position:relative;height:210px">
+        <canvas id="lc" role="img" aria-label="Daily GMV vs target">GMV từng ngày so target.</canvas>
+      </div>
+    </div>
+    <div class="c">
+      <div class="sl">Nhận định</div>
+      <div id="insights-panel"><div style="font-size:10px;color:var(--mu)">Đang phân tích...</div></div>
+    </div>
+  </div>
+
+  <div class="row r31">
+    <div class="c">
+      <div class="sl">Đơn hàng theo ngày</div>
+      <div style="position:relative;height:130px">
+        <canvas id="bc" role="img" aria-label="Đơn hàng theo ngày">Số đơn từng ngày.</canvas>
+      </div>
+    </div>
+    <div class="c">
+      <div class="sl">Cảnh báo</div>
+      <div id="alerts-panel"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SKU TAB -->
+<div class="panel" id="tab-sku">
+  <div class="row r22">
+    <div class="c">
+      <div class="sl">Top SKU — GMV & % Đóng góp</div>
+      <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <span style="font-size:9px;color:var(--mu)">Kênh:</span>
+        <select id="sku-ch" onchange="renderSku()">
+          <option value="all">Tất cả</option>
+          <option value="Shopee">Shopee</option>
+          <option value="Facebook">Facebook</option>
+          <option value="Tiktok">TikTok</option>
+        </select>
+      </div>
+      <div id="sku-list"></div>
+    </div>
+    <div class="c">
+      <div class="sl">% Đóng góp theo Màu sắc</div>
+      <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <span style="font-size:9px;color:var(--mu)">Sản phẩm:</span>
+        <select id="sel-c" onchange="renderColor()" style="flex:1;max-width:210px"></select>
+      </div>
+      <div id="color-list"></div>
+    </div>
+  </div>
+  <div class="row r22">
+    <div class="c">
+      <div class="sl">% Đóng góp theo Size</div>
+      <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <span style="font-size:9px;color:var(--mu)">Sản phẩm:</span>
+        <select id="sel-s" onchange="renderSize()" style="flex:1;max-width:210px"></select>
+      </div>
+      <div id="size-list"></div>
+    </div>
+    <div class="c">
+      <div class="sl">Gender Split</div>
+      <div style="display:flex;gap:16px;align-items:center">
+        <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+          <canvas id="gender-dc" role="img" aria-label="Gender donut">Bé gái 58.7%, Bé trai 29%, Unisex 12.2%</canvas>
+        </div>
+        <div>
+          <div class="leg"><div class="ld" style="background:#D99A7A"></div><span style="flex:1">Bé gái</span><b>58.7%</b></div>
+          <div class="leg"><div class="ld" style="background:#6B4F3F"></div><span style="flex:1">Bé trai</span><b>29.0%</b></div>
+          <div class="leg"><div class="ld" style="background:#EAD8C0"></div><span style="flex:1">Unisex</span><b>12.2%</b></div>
+          <div style="margin-top:6px;font-size:9px;color:var(--mu)">Tổng: ₫326.3M</div>
+        </div>
+      </div>
+      <div class="sl" style="margin-top:12px">% Đóng góp kênh</div>
+      <div style="position:relative;height:100px">
+        <canvas id="ch-bar" role="img" aria-label="Channel bar">Shopee, Facebook, TikTok</canvas>
+      </div>
+      <div style="font-size:8px;color:var(--mu);margin-top:4px;padding:3px 6px;background:var(--bg);border-radius:4px">Website không có dữ liệu — đã loại bỏ</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+/* ---- PER-CHANNEL DAILY DATA ---- */
+const CH = {
+  all: {
+    days: [
+      {d:'2026-04-10',lb:'10/4',gmv:9495140,tgt:21221053,ord:7},
+      {d:'2026-04-11',lb:'11/4',gmv:22707000,tgt:78240000,ord:17},
+      {d:'2026-04-12',lb:'12/4',gmv:64445770,tgt:78240000,ord:57},
+      {d:'2026-04-13',lb:'13/4',gmv:24325000,tgt:36461053,ord:31},
+      {d:'2026-04-14',lb:'14/4',gmv:15394892,tgt:36461053,ord:14},
+      {d:'2026-04-15',lb:'15/4',gmv:20843400,tgt:36461053,ord:25},
+      {d:'2026-04-16',lb:'16/4',gmv:23648320,tgt:36461053,ord:24},
+      {d:'2026-04-17',lb:'17/4',gmv:10699950,tgt:36461053,ord:14},
+      {d:'2026-04-18',lb:'18/4',gmv:26459190,tgt:36461053,ord:25},
+      {d:'2026-04-19',lb:'19/4',gmv:24344304,tgt:36461053,ord:27},
+      {d:'2026-04-20',lb:'20/4',gmv:13821000,tgt:36461053,ord:17},
+      {d:'2026-04-21',lb:'21/4',gmv:19334000,tgt:36461053,ord:16},
+      {d:'2026-04-22',lb:'22/4',gmv:12332000,tgt:36461053,ord:13},
+      {d:'2026-04-23',lb:'23/4',gmv:24591000,tgt:36461053,ord:31},
+      {d:'2026-04-24',lb:'24/4',gmv:17228000,tgt:36461053,ord:13},
+      {d:'2026-04-25',lb:'25/4',gmv:14628000,tgt:36461053,ord:17},
+      {d:'2026-04-26',lb:'26/4',gmv:12460000,tgt:36461053,ord:14},
+      {d:'2026-04-27',lb:'27/4',gmv:7795000,tgt:36461053,ord:9},
+    ],
+    monthTarget:1512000000,
+    extra:null
+  },
+  Shopee:{
+    days:[
+      {d:'2026-04-10',lb:'10/4',gmv:8894000,tgt:21221053,ord:6,aov:1482333,cr:0.0145,visitor:280},
+      {d:'2026-04-11',lb:'11/4',gmv:12965000,tgt:63000000,ord:11,aov:1178636,cr:0.0133,visitor:477},
+      {d:'2026-04-12',lb:'12/4',gmv:43298000,tgt:63000000,ord:41,aov:1056049,cr:0.0124,visitor:4166},
+      {d:'2026-04-13',lb:'13/4',gmv:16508000,tgt:21221053,ord:23,aov:717739,cr:0.0107,visitor:3276},
+      {d:'2026-04-14',lb:'14/4',gmv:9632000,tgt:21221053,ord:8,aov:1204000,cr:0.0067,visitor:966},
+      {d:'2026-04-15',lb:'15/4',gmv:15533000,tgt:21221053,ord:19,aov:817526,cr:0.013,visitor:1438},
+      {d:'2026-04-16',lb:'16/4',gmv:18392000,tgt:21221053,ord:15,aov:1226133,cr:0.0095,visitor:1593},
+      {d:'2026-04-17',lb:'17/4',gmv:6668000,tgt:21221053,ord:10,aov:666800,cr:0.0078,visitor:1274},
+      {d:'2026-04-18',lb:'18/4',gmv:19127000,tgt:21221053,ord:20,aov:956350,cr:0.0116,visitor:1893},
+      {d:'2026-04-19',lb:'19/4',gmv:18086000,tgt:21221053,ord:21,aov:861238,cr:0.0135,visitor:1779},
+      {d:'2026-04-20',lb:'20/4',gmv:10627000,tgt:21221053,ord:14,aov:759071,cr:0.0149,visitor:1080},
+      {d:'2026-04-21',lb:'21/4',gmv:14621000,tgt:21221053,ord:13,aov:1124692,cr:0.0177,visitor:687},
+      {d:'2026-04-22',lb:'22/4',gmv:8326000,tgt:21221053,ord:11,aov:756909,cr:0.0136,visitor:588},
+      {d:'2026-04-23',lb:'23/4',gmv:19403000,tgt:21221053,ord:25,aov:776120,cr:0.0276,visitor:1846},
+      {d:'2026-04-24',lb:'24/4',gmv:14432000,tgt:21221053,ord:11,aov:1312000,cr:0.0087,visitor:2242},
+      {d:'2026-04-25',lb:'25/4',gmv:11255000,tgt:21221053,ord:15,aov:750333,cr:0.0145,visitor:2749},
+      {d:'2026-04-26',lb:'26/4',gmv:6318000,tgt:21221053,ord:9,aov:702000,cr:0.0089,visitor:1759},
+      {d:'2026-04-27',lb:'27/4',gmv:7795000,tgt:21221053,ord:9,aov:866111,cr:0.0157,visitor:907},
+    ],
+    monthTarget:529200000,
+    extra:{type:'shopee'}
+  },
+  Facebook:{
+    days:[
+      {d:'2026-04-11',lb:'11/4',gmv:9742000,tgt:15240000,ord:6,aov:1623667,ads:696134},
+      {d:'2026-04-12',lb:'12/4',gmv:18528000,tgt:15240000,ord:10,aov:1852800,ads:1818840},
+      {d:'2026-04-13',lb:'13/4',gmv:7178000,tgt:15240000,ord:7,aov:1025429,ads:1410096},
+      {d:'2026-04-14',lb:'14/4',gmv:4862000,tgt:15240000,ord:4,aov:1215500,ads:1790785},
+      {d:'2026-04-15',lb:'15/4',gmv:4192000,tgt:15240000,ord:3,aov:1397333,ads:1352754},
+      {d:'2026-04-16',lb:'16/4',gmv:3005000,tgt:15240000,ord:3,aov:1001667,ads:931602},
+      {d:'2026-04-17',lb:'17/4',gmv:3105000,tgt:15240000,ord:2,aov:1552500,ads:416664},
+      {d:'2026-04-18',lb:'18/4',gmv:7009000,tgt:15240000,ord:4,aov:1752250,ads:1374265},
+      {d:'2026-04-19',lb:'19/4',gmv:5998000,tgt:15240000,ord:5,aov:1199600,ads:1414363},
+      {d:'2026-04-20',lb:'20/4',gmv:3194000,tgt:15240000,ord:3,aov:1064667,ads:1701406},
+      {d:'2026-04-21',lb:'21/4',gmv:4713000,tgt:15240000,ord:3,aov:1571000,ads:1137533},
+      {d:'2026-04-22',lb:'22/4',gmv:4006000,tgt:15240000,ord:2,aov:2003000,ads:2159950},
+      {d:'2026-04-23',lb:'23/4',gmv:5188000,tgt:15240000,ord:6,aov:864667,ads:2070077},
+      {d:'2026-04-24',lb:'24/4',gmv:2796000,tgt:15240000,ord:2,aov:1398000,ads:1948870},
+      {d:'2026-04-25',lb:'25/4',gmv:3373000,tgt:15240000,ord:2,aov:1686500,ads:1703779},
+      {d:'2026-04-26',lb:'26/4',gmv:6142000,tgt:15240000,ord:5,aov:1228400,ads:0},
+    ],
+    monthTarget:304800000,
+    extra:{type:'facebook'}
+  },
+  Tiktok:{
+    days:[
+      {d:'2026-04-12',lb:'12/4',gmv:1007000,tgt:0,ord:2,aov:503500,cr:0.11,visitor:1866},
+      {d:'2026-04-15',lb:'15/4',gmv:601140,tgt:0,ord:1,aov:601140,cr:0.98,visitor:102},
+      {d:'2026-04-17',lb:'17/4',gmv:2619770,tgt:0,ord:6,aov:436628,cr:1.98,visitor:101},
+      {d:'2026-04-18',lb:'18/4',gmv:639000,tgt:0,ord:1,aov:639000,cr:0.70,visitor:143},
+      {d:'2026-04-19',lb:'19/4',gmv:900892,tgt:0,ord:2,aov:450446,cr:0.24,visitor:824},
+      {d:'2026-04-20',lb:'20/4',gmv:1118400,tgt:0,ord:3,aov:372800,cr:0.13,visitor:780},
+      {d:'2026-04-21',lb:'21/4',gmv:2251320,tgt:0,ord:6,aov:375220,cr:0.78,visitor:513},
+      {d:'2026-04-22',lb:'22/4',gmv:926950,tgt:0,ord:2,aov:463475,cr:1.07,visitor:187},
+      {d:'2026-04-23',lb:'23/4',gmv:323190,tgt:0,ord:1,aov:323190,cr:0.85,visitor:118},
+      {d:'2026-04-24',lb:'24/4',gmv:260304,tgt:0,ord:1,aov:260304,cr:0.61,visitor:164},
+    ],
+    monthTarget:378000000,
+    extra:{type:'tiktok'}
+  }
+};
+
+const SKU_DATA=[
+  {name:'Set đồ thể thao bé trai',gmv_all:60345014,gmv_ch:{Shopee:44988014,Facebook:13281000,Tiktok:2076000},colors:{'Nâu':21029253,'Kem':16047955,'Xanh':11530775,'Trắng - Nâu':9080831,'Trắng - Xanh':2656200},sizes:{'6Y':19880922,'4Y':11044200,'3Y':10918350,'1.5Y':7974380,'2Y':7870962,'5Y':2656200}},
+  {name:'Đầm thuỷ thủ bé gái',gmv_all:50777233,gmv_ch:{Shopee:36356233,Facebook:9867000,Tiktok:4554000},colors:{'Hồng':41054443,'Trắng':9722790},sizes:{'6Y':12351560,'3Y':11916300,'4Y':9971169,'1.5Y':6686790,'5Y':4968414,'2Y':4883000}},
+  {name:'Bodysuit tay ngắn có viền',gmv_all:39871140,gmv_ch:{Shopee:26711140,Facebook:11515000,Tiktok:1645000},colors:{'Xanh':8368940,'Trắng':5850360,'Hồng':5770660,'Nâu - Kem':4420940,'Trắng - Xanh':4049000,'Kem':3855880,'Trắng - Hồng':3290000,'Trắng - Nâu':3278360},sizes:{'1-3M':8839240,'12-18M':8732360,'3-6M':7422240,'9-12M':6890000,'6-9M':4178300,'0-1M':3809000}},
+  {name:'Chân váy A đính nơ bé gái',gmv_all:28844193,gmv_ch:{Shopee:18062193,Facebook:10183000,Tiktok:599000},colors:{'Hồng':20591196,'Nâu':5257997,'Trắng':2995000},sizes:{'2Y':7939994,'6Y':6528200,'4Y':4672200,'3Y':4672200,'5Y':2755399,'1.5Y':2276200}},
+  {name:'Set thể thao bé gái',gmv_all:22846779,gmv_ch:{Shopee:13900779,Facebook:7668000,Tiktok:1278000},colors:{'Hồng':13389579,'Xanh':6901200,'Trắng':2556000},sizes:{'6Y':5623200,'4Y':5607864,'3Y':4345200,'5Y':4345200,'2Y':2414115,'1.5Y':511200}},
+  {name:'Áo Polo viền sò bé gái',gmv_all:21407700,gmv_ch:{Shopee:14719700,Facebook:6149000,Tiktok:539000},colors:{'Hồng':11873180,'Trắng':9534520},sizes:{'2Y':6348320,'6Y':4264200,'5Y':4204200,'3Y':3234000,'4Y':2817980,'1.5Y':539000}},
+  {name:'Set ba lỗ bé gái',gmv_all:20173353,gmv_ch:{Shopee:13882353,Facebook:6291000,Tiktok:0},colors:{'Trắng - Nâu':6694993,'Trắng - Hồng':4781160,'Hồng - Trắng':3495000,'Xanh':3105200,'Trắng - Xanh':2097000},sizes:{'1.5Y':5312400,'4Y':4194000,'6Y':3383160,'3Y':2796000,'2Y':2390793,'5Y':2097000}},
+  {name:'Quần dài thể thao bé trai',gmv_all:13748652,gmv_ch:{Shopee:11153652,Facebook:2595000,Tiktok:0},colors:{'Nâu':6898770,'Kem':4254882,'Xanh':2595000},sizes:{'2Y':4446912,'6Y':3633000,'3Y':1972200,'1.5Y':1557000,'5Y':1380540,'4Y':759000}},
+  {name:'Quần leggings nơ bé gái',gmv_all:11521770,gmv_ch:{Shopee:5655770,Facebook:5447000,Tiktok:419000},colors:{'Trắng':4956770,'Hồng':3213000,'Xanh':2514000,'Nâu':838000},sizes:{'4Y':3352000,'3Y':2794000,'5Y':1676000,'6Y':1676000,'2Y':1185770,'1.5Y':838000}},
+  {name:'Áo thun cánh tiên bé gái',gmv_all:10657880,gmv_ch:{Shopee:7963431,Facebook:2694449,Tiktok:0},colors:{'Trắng':10657880},sizes:{'5Y':3053201,'6Y':2532809,'2Y':2018670,'4Y':1347000,'3Y':898000,'1.5Y':808200}},
+];
+
+const fmt=v=>v>=1e9?'₫'+(v/1e9).toFixed(1)+'B':v>=1e6?'₫'+(v/1e6).toFixed(1)+'M':v>=1e3?'₫'+(v/1e3).toFixed(0)+'K':'₫'+v;
+const pct=(v,t)=>t>0?(v/t*100).toFixed(1)+'%':'0%';
+const CP=['#D99A7A','#6B4F3F','#F3C6B8','#C8A882','#9C7C6E','#EAD8C0','#B8927A','#8B6B5A'];
+
+let fromDate='2026-04-10',toDate='2026-04-27',activeCh='all';
+let lineChart,donutChart,barChart,chBarChart,genderChart;
+let skuInit=false;
+
+function getRows(){
+  return (CH[activeCh]?.days||[]).filter(r=>r.d>=fromDate&&r.d<=toDate);
+}
+
+function setPreset(p,btn){
+  document.querySelectorAll('.db').forEach(b=>b.classList.remove('act'));btn.classList.add('act');
+  const m={all:['2026-04-10','2026-04-27'],w1:['2026-04-10','2026-04-16'],w2:['2026-04-17','2026-04-23'],w3:['2026-04-24','2026-04-27']};
+  [fromDate,toDate]=m[p];
+  document.getElementById('d-from').value=fromDate;document.getElementById('d-to').value=toDate;
+  applyFilters();
+}
+function clearPreset(){document.querySelectorAll('.db').forEach(b=>b.classList.remove('act'));}
+function setCh(ch,btn){
+  activeCh=ch;
+  document.querySelectorAll('.cp').forEach(b=>b.classList.remove('act'));btn.classList.add('act');
+  applyFilters();
+}
+function applyFilters(){
+  const fi=document.getElementById('d-from').value,ti=document.getElementById('d-to').value;
+  if(fi)fromDate=fi;if(ti)toDate=ti;
+  const cn=activeCh==='all'?'Tất cả kênh':activeCh==='Tiktok'?'TikTok':activeCh;
+  const fd=fromDate.slice(8)+'/'+fromDate.slice(5,7),td=toDate.slice(8)+'/'+toDate.slice(5,7);
+  document.getElementById('fn').textContent=fd+' → '+td+' · '+cn;
+  document.getElementById('cr').textContent='('+fd+' – '+td+')';
+  updateOverview();
+}
+
+function updateOverview(){
+  const rows=getRows();
+  const gmvs=rows.map(r=>r.gmv),tgts=rows.map(r=>r.tgt),ords=rows.map(r=>r.ord),labels=rows.map(r=>r.lb);
+  const tGMV=gmvs.reduce((a,b)=>a+b,0);
+  const tTgt=tgts.reduce((a,b)=>a+b,0);
+  const tOrd=ords.reduce((a,b)=>a+b,0);
+  const p=tTgt>0?tGMV/tTgt*100:0;
+  const active=gmvs.filter(v=>v>0).length||1;
+  const peakOrd=Math.max(...ords,0);
+  const peakIdx=ords.indexOf(peakOrd);
+  const tAOV=tOrd>0?Math.round(tGMV/tOrd):0;
+
+  // GMV card
+  document.getElementById('k-gmv').textContent=fmt(tGMV);
+  document.getElementById('k-pct').textContent=p.toFixed(1)+'% đạt';
+  document.getElementById('k-bar').style.width=Math.min(p,100)+'%';
+  const mTgt=CH[activeCh]?.monthTarget||1512000000;
+  document.getElementById('k-tgt').textContent=fmt(tTgt||mTgt);
+
+  // Orders card
+  document.getElementById('k-ord').textContent=tOrd;
+  document.getElementById('k-pk').textContent=peakOrd;
+  document.getElementById('k-pkd').textContent=rows[peakIdx]?.lb||'—';
+  document.getElementById('k-avg').textContent=(tOrd/active).toFixed(1);
+  document.getElementById('k-apd').textContent='~'+(tOrd/active).toFixed(1)+'/ngày';
+
+  // AOV card — thay đổi theo kênh
+  document.getElementById('k-aov').textContent=fmt(tAOV);
+  const aovPill=document.getElementById('k-aov-pill');
+  if(activeCh==='all'){
+    aovPill.textContent='Tất cả kênh';aovPill.className='pill pg';
+    document.getElementById('k-aov-detail').innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Facebook</span><span style="font-weight:700;color:var(--br)">₫1.16M</span></div>
+      <div class="kline"><span style="color:var(--mu)">Shopee</span><span style="font-weight:700;color:var(--br)">₫921K</span></div>
+      <div class="kline"><span style="color:var(--mu)">TikTok</span><span style="font-weight:700;color:var(--br)">₫648K</span></div>`;
+  } else {
+    const avgAOV=rows.filter(r=>r.aov>0).reduce((s,r,_,a)=>s+r.aov/a.length,0);
+    const maxAOV=Math.max(...rows.map(r=>r.aov||0));
+    const minAOV=Math.min(...rows.filter(r=>r.aov>0).map(r=>r.aov||Infinity));
+    aovPill.textContent=activeCh==='Tiktok'?'TikTok':activeCh;aovPill.className='pill pw';
+    document.getElementById('k-aov-detail').innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Cao nhất</span><span style="font-weight:700;color:var(--br)">${fmt(maxAOV)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Thấp nhất</span><span style="font-weight:700;color:var(--br)">${fmt(minAOV)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Trung bình</span><span style="font-weight:700;color:var(--br)">${fmt(Math.round(avgAOV))}</span></div>`;
+  }
+
+  // 4th card — chỉ số đặc trưng của từng kênh
+  renderExtraCard(rows);
+
+  // Charts
+  if(lineChart){lineChart.data.labels=labels;lineChart.data.datasets[0].data=gmvs;lineChart.data.datasets[1].data=tgts;lineChart.update();}
+  if(barChart){barChart.data.labels=labels;barChart.data.datasets[0].data=ords;barChart.data.datasets[0].backgroundColor=ords.map(v=>v>=30?'#6B4F3F':v>=20?'#D99A7A':'#EAD8C0');barChart.update();}
+
+  // Donut — channel contribution (always all-channel view)
+  const allRows=CH.all.days.filter(r=>r.d>=fromDate&&r.d<=toDate);
+  const spT=CH.Shopee.days.filter(r=>r.d>=fromDate&&r.d<=toDate).reduce((s,r)=>s+r.gmv,0);
+  const fbT=CH.Facebook.days.filter(r=>r.d>=fromDate&&r.d<=toDate).reduce((s,r)=>s+r.gmv,0);
+  const ttT=CH.Tiktok.days.filter(r=>r.d>=fromDate&&r.d<=toDate).reduce((s,r)=>s+r.gmv,0);
+  const ct=spT+fbT+ttT||1;
+  if(donutChart){donutChart.data.datasets[0].data=[spT,fbT,ttT];donutChart.update();}
+  document.getElementById('dl-sp').textContent=pct(spT,ct);
+  document.getElementById('dl-fb').textContent=pct(fbT,ct);
+  document.getElementById('dl-tt').textContent=pct(ttT,ct);
+
+  renderInsights(tGMV,p,spT,fbT,ttT,ct,tAOV);
+  renderAlerts(p,tGMV);
+}
+
+function renderExtraCard(rows){
+  const lbl=document.getElementById('k-extra-lbl');
+  const val=document.getElementById('k-extra-val');
+  const sub=document.getElementById('k-extra-sub');
+  const det=document.getElementById('k-extra-detail');
+
+  if(activeCh==='all'){
+    lbl.textContent='Dự báo cuối tháng';
+    const totalActual=CH.all.days.filter(r=>r.gmv>0).reduce((s,r)=>s+r.gmv,0);
+    const activeDays=CH.all.days.filter(r=>r.gmv>0).length||1;
+    const forecast=Math.round(totalActual/activeDays*30);
+    const fcstPct=1512000000>0?forecast/1512000000*100:0;
+    val.textContent=fmt(forecast);val.style.color='var(--da)';
+    sub.innerHTML=`<span class="pill pr">${fcstPct.toFixed(1)}% target</span>`;
+    det.innerHTML=`<div class="kline"><span style="color:var(--mu)">Gap</span><span style="font-weight:700;color:var(--da)">${fmt(Math.max(0,1512000000-totalActual))}</span></div><div class="kline"><span style="color:var(--mu)">Còn lại</span><span style="font-weight:700;color:var(--br)">${30-activeDays} ngày</span></div>`;
+  } else if(activeCh==='Shopee'){
+    lbl.textContent='Shopee — Visitor & CR';
+    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
+    const avgCR=rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0);
+    val.textContent=tVis.toLocaleString();val.style.color='var(--br)';
+    sub.innerHTML=`<span class="pill pg">Visitors</span>`;
+    det.innerHTML=`<div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${(avgCR*100).toFixed(2)}%</span></div><div class="kline"><span style="color:var(--mu)">Visitor/ngày</span><span style="font-weight:700;color:var(--br)">${Math.round(tVis/(rows.length||1)).toLocaleString()}</span></div><div class="kline"><span style="color:var(--mu)">CR tốt nhất</span><span style="font-weight:700;color:var(--su)">${(Math.max(...rows.map(r=>r.cr||0))*100).toFixed(2)}%</span></div>`;
+  } else if(activeCh==='Facebook'){
+    lbl.textContent='Facebook — Ads Spend';
+    const tAds=rows.reduce((s,r)=>s+(r.ads||0),0);
+    const tGMV=rows.reduce((s,r)=>s+r.gmv,0);
+    const cir=tGMV>0?tAds/tGMV*100:0;
+    const roas=tAds>0?tGMV/tAds:0;
+    val.textContent=fmt(tAds);val.style.color=cir>30?'var(--da)':'var(--wa)';
+    sub.innerHTML=`<span class="pill ${cir>30?'pr':'pw'}">CIR ${cir.toFixed(1)}%</span>`;
+    det.innerHTML=`<div class="kline"><span style="color:var(--mu)">ROAS</span><span style="font-weight:700;color:var(--br)">${roas.toFixed(2)}x</span></div><div class="kline"><span style="color:var(--mu)">Ads/ngày TB</span><span style="font-weight:700;color:var(--br)">${fmt(Math.round(tAds/(rows.length||1)))}</span></div><div class="kline"><span style="color:var(--mu)">GMV/Ads</span><span style="font-weight:700;color:${roas>=3?'var(--su)':'var(--da)'}">₫${roas.toFixed(1)} / ₫1</span></div>`;
+  } else if(activeCh==='Tiktok'){
+    lbl.textContent='TikTok — Visitor & CR';
+    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
+    const avgCR=rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0);
+    val.textContent=tVis.toLocaleString();val.style.color='var(--br)';
+    sub.innerHTML=`<span class="pill pw">Visitors</span>`;
+    det.innerHTML=`<div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${avgCR.toFixed(2)}%</span></div><div class="kline"><span style="color:var(--mu)">Ngày có sale</span><span style="font-weight:700;color:var(--br)">${rows.length} ngày</span></div><div class="kline"><span style="color:var(--mu)">CR cao nhất</span><span style="font-weight:700;color:var(--su)">${Math.max(...rows.map(r=>r.cr||0)).toFixed(2)}%</span></div>`;
+  }
+}
+
+function renderInsights(gmv,p,sp,fb,tt,tot,aov){
+  const spPct=(sp/tot*100).toFixed(0),ttPct=(tt/tot*100).toFixed(0);
+  let h=`<div class="isec" style="color:var(--su);margin-top:0">Tích cực</div>`;
+  if(activeCh==='all'&&sp>fb)h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Shopee chiếm ${spPct}% GMV — organic mạnh qua Shop Tab</div></div>`;
+  if(activeCh==='Facebook')h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">AOV Facebook cao nhất ₫1.16M — khách có giá trị đơn tốt</div></div>`;
+  if(activeCh==='Shopee')h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Shopee CR tốt nhất ngày 23/4 (2.76%) — nên tái tạo</div></div>`;
+  if(activeCh==='Tiktok')h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">TikTok CR 17/4 đạt 1.98% — livestream hiệu quả</div></div>`;
+  h+=`<div class="isec" style="color:var(--da)">Rủi ro</div>`;
+  if(p<80)h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">GMV ${p.toFixed(1)}% target trong khoảng đang xem</div></div>`;
+  if(activeCh==='Facebook')h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">CIR cao (>30% nhiều ngày) — hiệu quả ads đang giảm</div></div>`;
+  if(activeCh==='Tiktok')h+=`<div class="ir"><div class="id" style="background:var(--wa)"></div><div class="it">Visitor TikTok thấp — cần đẩy traffic vào shop</div></div>`;
+  if(activeCh==='all'&&ttPct<10)h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">TikTok chỉ ${ttPct}% GMV — kênh chưa khai thác</div></div>`;
+  h+=`<div class="isec" style="color:var(--br)">Hành động</div>`;
+  if(activeCh==='Facebook')h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Pause nhóm ads CIR >30%, tập trung ngân sách ngày AOV cao</div></div>`;
+  else if(activeCh==='Tiktok')h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Livestream định kỳ — nhân mô hình ngày 17/4 (₫2.6M, 6 đơn)</div></div>`;
+  else if(activeCh==='Shopee')h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Flash sale 29–30/4 với top SKU bé trai và đầm thuỷ thủ</div></div>`;
+  else h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Flash sale Shopee 29–30/4 → target ₫100M+</div></div>`;
+  document.getElementById('insights-panel').innerHTML=h;
+}
+
+function renderAlerts(p,gmv){
+  let h='';
+  if(p<80)h+=`<div style="background:#FCE8E8;border-radius:7px;padding:7px 9px;margin-bottom:5px"><div style="font-size:9px;font-weight:700;color:var(--da)">GMV ${p.toFixed(1)}% target</div><div style="font-size:9px;color:var(--mu)">Dưới ngưỡng 80%</div></div>`;
+  if(activeCh==='Facebook')h+=`<div style="background:#FDF3E0;border-radius:7px;padding:7px 9px;margin-bottom:5px"><div style="font-size:9px;font-weight:700;color:var(--wa)">CIR FB vượt 30% nhiều ngày</div><div style="font-size:9px;color:var(--mu)">Cần tối ưu targeting</div></div>`;
+  if(activeCh==='Tiktok')h+=`<div style="background:#FDF3E0;border-radius:7px;padding:7px 9px;margin-bottom:5px"><div style="font-size:9px;font-weight:700;color:var(--wa)">TikTok: 10/18 ngày có doanh thu</div><div style="font-size:9px;color:var(--mu)">Cần lịch đăng đều hơn</div></div>`;
+  h+=`<div style="background:#E8F3E9;border-radius:7px;padding:7px 9px"><div style="font-size:9px;font-weight:700;color:var(--su)">AOV ổn định — vấn đề là volume</div></div>`;
+  document.getElementById('alerts-panel').innerHTML=h;
+}
+
+function initCharts(){
+  donutChart=new Chart(document.getElementById('dc'),{type:'doughnut',data:{labels:['Shopee','Facebook','TikTok'],datasets:[{data:[228148464,85955449,12157000],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8'],borderWidth:0,hoverOffset:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,c.dataset.data.reduce((a,b)=>a+b,0))}}}}});
+  const rows=CH.all.days,labels=rows.map(r=>r.lb),gmvs=rows.map(r=>r.gmv),tgts=rows.map(r=>r.tgt),ords=rows.map(r=>r.ord);
+  lineChart=new Chart(document.getElementById('lc'),{type:'line',data:{labels,datasets:[{label:'GMV',data:gmvs,borderColor:'#D99A7A',backgroundColor:'rgba(217,154,122,0.1)',fill:true,tension:0.35,pointRadius:2,borderWidth:2},{label:'Target',data:tgts,borderColor:'#C8A882',backgroundColor:'transparent',tension:0,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:12}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}}}}});
+  barChart=new Chart(document.getElementById('bc'),{type:'bar',data:{labels,datasets:[{label:'Đơn',data:ords,backgroundColor:ords.map(v=>v>=30?'#6B4F3F':v>=20?'#D99A7A':'#EAD8C0'),borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' đơn'}}},scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:12}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}}}}});
+}
+
+function switchTab(t,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  btn.classList.add('act');document.getElementById('tab-'+t).classList.add('act');
+  if(t==='sku')initSkuTab();
+}
+
+function initSkuTab(){
+  if(skuInit)return;skuInit=true;
+  const s1=document.getElementById('sel-c'),s2=document.getElementById('sel-s');
+  s1.innerHTML='<option value="all">Tất cả sản phẩm</option>';
+  s2.innerHTML='<option value="all">Tất cả sản phẩm</option>';
+  SKU_DATA.forEach(s=>{s1.innerHTML+=`<option value="${s.name}">${s.name}</option>`;s2.innerHTML+=`<option value="${s.name}">${s.name}</option>`;});
+  genderChart=new Chart(document.getElementById('gender-dc'),{type:'doughnut',data:{labels:['Bé gái','Bé trai','Unisex'],datasets:[{data:[191615047,94774726,39871140],backgroundColor:['#D99A7A','#6B4F3F','#EAD8C0'],borderWidth:0,hoverOffset:3}]},options:{responsive:true,maintainAspectRatio:true,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const t=191615047+94774726+39871140;return ' '+pct(c.parsed,t)+' · '+fmt(c.parsed);}}}}}});
+  const sp=CH.Shopee.days.reduce((s,r)=>s+r.gmv,0),fb=CH.Facebook.days.reduce((s,r)=>s+r.gmv,0),tt=CH.Tiktok.days.reduce((s,r)=>s+r.gmv,0);
+  chBarChart=new Chart(document.getElementById('ch-bar'),{type:'bar',data:{labels:['Shopee','Facebook','TikTok'],datasets:[{data:[sp,fb,tt],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8'],borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x)+' ('+pct(c.parsed.x,sp+fb+tt)+')'}}},scales:{x:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#3A2A20'}}}}});
+  renderSku();renderColor();renderSize();
+}
+
+function renderSku(){
+  const ch=document.getElementById('sku-ch').value;
+  const sorted=[...SKU_DATA].sort((a,b)=>(b.gmv_ch[ch]||b.gmv_all)-(a.gmv_ch[ch]||a.gmv_all));
+  const tot=sorted.reduce((s,r)=>s+(r.gmv_ch[ch]||r.gmv_all),0)||1,max=(sorted[0]?.gmv_ch[ch]||sorted[0]?.gmv_all)||1;
+  document.getElementById('sku-list').innerHTML=sorted.map((s,i)=>{const v=s.gmv_ch[ch]||s.gmv_all;return`<div class="sr"><span style="font-size:9px;color:var(--mu);min-width:14px;font-weight:700">${i+1}</span><span class="sn">${s.name}</span><div class="st2"><div class="sf2" style="width:${Math.round(v/max*100)}%"></div></div><span class="sv">${fmt(v)}</span><span class="sp">${pct(v,tot)}</span></div>`;}).join('');
+}
+function renderBars(id,obj){
+  const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+  const tot=entries.reduce((s,[,v])=>s+v,0)||1,max=entries[0]?.[1]||1;
+  document.getElementById(id).innerHTML=entries.map(([k,v],i)=>`<div class="sr"><div style="width:8px;height:8px;border-radius:2px;background:${CP[i%CP.length]};flex-shrink:0"></div><span class="sn">${k}</span><div class="st2" style="width:55px"><div class="sf2" style="width:${Math.round(v/max*100)}%;background:${CP[i%CP.length]}"></div></div><span class="sv">${fmt(v)}</span><span class="sp">${pct(v,tot)}</span></div>`).join('');
+}
+function renderColor(){const sel=document.getElementById('sel-c').value;let d={};if(sel==='all')SKU_DATA.forEach(s=>Object.entries(s.colors).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU_DATA.find(s=>s.name===sel);if(f)d=f.colors;}renderBars('color-list',d);}
+function renderSize(){const sel=document.getElementById('sel-s').value;let d={};if(sel==='all')SKU_DATA.forEach(s=>Object.entries(s.sizes).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU_DATA.find(s=>s.name===sel);if(f)d=f.sizes;}renderBars('size-list',d);}
+
+initCharts();
+applyFilters();
+</script>
