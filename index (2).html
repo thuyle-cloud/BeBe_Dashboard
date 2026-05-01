@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BéBé — Performance Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FFF8F1;--card:#fff;--br:#6B4F3F;--be:#EAD8C0;--pe:#D99A7A;--bl:#F3C6B8;--mu:#9C7C6E;--tx:#3A2A20;--su:#6F8F72;--wa:#D8A23A;--da:#C94C4C}
+body{background:var(--bg);font-family:system-ui,-apple-system,sans-serif;color:var(--tx);font-size:12px}
+
+/* LOADING */
+#ls{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px}
+.lb{font-size:38px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:2px}
+.spin{width:28px;height:28px;border:3px solid var(--bl);border-top-color:var(--pe);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.lmsg{font-size:11px;color:var(--mu)}
+.err-box{background:#FCE8E8;border:1px solid #f5c6c6;border-radius:12px;padding:18px 24px;max-width:460px;text-align:center}
+.err-box h3{color:var(--da);margin-bottom:8px;font-size:13px}
+.err-box p{color:#8b3a3a;font-size:11px;line-height:1.7}
+
+/* LAYOUT */
+.wrap{padding:10px;display:none}
+.hdr{background:#fff;border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;border:1px solid var(--bl);flex-wrap:wrap}
+.brand{font-size:19px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:1px}
+.hm{flex:1;font-size:10px;color:var(--mu)}
+.upd{font-size:9px;color:var(--mu);background:var(--bg);padding:3px 9px;border-radius:20px;border:1px solid var(--be)}
+.rfbtn{font-size:9px;padding:3px 10px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer}
+
+/* FILTERS */
+.fb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.fl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+select{font-size:10px;font-family:inherit;padding:4px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;outline:none}
+input[type=date]{font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);font-family:inherit;cursor:pointer;outline:none}
+.sep{color:var(--be);font-size:11px}
+.abtn{font-size:10px;padding:4px 12px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer;font-weight:600}
+.cp{font-size:10px;padding:4px 11px;border-radius:20px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;transition:all .15s}
+.cp.act{background:var(--pe);color:#fff;border-color:var(--pe)}
+.fn{font-size:9px;color:var(--mu)}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:8px}
+.tab{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--be);background:#fff;color:var(--mu)}
+.tab.act{background:var(--br);color:#fff;border-color:var(--br)}
+.panel{display:none}.panel.act{display:block}
+
+/* GRID */
+.row{display:grid;gap:8px;margin-bottom:8px}
+.r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.r211{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
+.r31{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+.r22{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media(max-width:900px){.r4{grid-template-columns:repeat(2,1fr)}.r211,.r31,.r22{grid-template-columns:1fr}}
+
+/* CARDS */
+.c{background:#fff;border-radius:12px;padding:11px 13px;border:1px solid rgba(217,154,122,.18)}
+.lbl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
+.val{font-size:22px;font-weight:700;color:var(--br);line-height:1}
+.sub{font-size:10px;color:var(--mu);margin-top:4px;display:flex;align-items:center;gap:5px}
+.pill{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700}
+.pg{background:#E8F3E9;color:var(--su)}.pw{background:#FDF3E0;color:var(--wa)}.pr{background:#FCE8E8;color:var(--da)}
+.bt{background:var(--bl);border-radius:4px;height:5px;margin-top:6px;overflow:hidden}
+.bf{height:100%;background:var(--pe);border-radius:4px;transition:width .4s}
+.sl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.leg{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:10px}
+.ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.sr{display:flex;align-items:center;gap:5px;margin-bottom:5px}
+.sn{flex:1;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st2{width:48px;background:var(--bl);border-radius:3px;height:4px;flex-shrink:0}
+.sf2{height:100%;background:var(--pe);border-radius:3px}
+.sv{font-size:10px;color:var(--br);font-weight:700;width:40px;text-align:right;flex-shrink:0}
+.sp2{font-size:9px;color:var(--mu);width:32px;text-align:right;flex-shrink:0}
+.krow{display:flex;flex-direction:column;gap:3px;margin-top:7px}
+.kline{display:flex;justify-content:space-between;font-size:9px}
+.ir{display:flex;gap:5px;margin-bottom:5px;align-items:flex-start}
+.id{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+.it{font-size:10px;line-height:1.4}
+.isec{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;margin-top:7px}
+.mini-stat{background:var(--bg);border-radius:6px;padding:5px 8px}
+.ms-lbl{font-size:8px;color:var(--mu)}
+.ms-val{font-size:13px;font-weight:700;color:var(--br)}
+</style>
+</head>
+<body>
+
+<!-- LOADING -->
+<div id="ls">
+  <div class="lb">bébé</div>
+  <div class="spin"></div>
+  <div class="lmsg" id="lmsg">Đang kết nối Google Sheets...</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="wrap" id="mw">
+  <div class="hdr">
+    <div class="brand">bébé</div>
+    <div class="hm">Performance Dashboard · <span id="hm-period">—</span></div>
+    <div class="upd">Cập nhật: <span id="lupd">—</span></div>
+    <button class="rfbtn" onclick="loadData()">↻ Refresh</button>
+  </div>
+
+  <!-- FILTERS -->
+  <div class="fb">
+    <span class="fl">Tháng:</span>
+    <select id="f-month" onchange="onMonthChange()"></select>
+    <span class="fl" style="margin-left:8px">Ngày:</span>
+    <input type="date" id="df" onchange="onDateChange()">
+    <span class="sep">→</span>
+    <input type="date" id="dt" onchange="onDateChange()">
+    <button class="abtn" onclick="applyFilters()">Áp dụng</button>
+    <span class="fn" id="fn">—</span>
+  </div>
+  <div class="fb">
+    <span class="fl">Kênh:</span>
+    <button class="cp act" onclick="setCh('all',this)">Tất cả</button>
+    <button class="cp" onclick="setCh('Shopee',this)">Shopee</button>
+    <button class="cp" onclick="setCh('Facebook',this)">Facebook</button>
+    <button class="cp" onclick="setCh('Tiktok',this)">TikTok</button>
+    <button class="cp" onclick="setCh('Event',this)">Event</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab act" onclick="switchTab('ov',this)">Overview</div>
+    <div class="tab" onclick="switchTab('sku',this)">SKU Performance</div>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div class="panel act" id="tab-ov">
+    <div class="row r4">
+      <div class="c">
+        <div class="lbl">Total GMV</div>
+        <div class="val" id="k-gmv">—</div>
+        <div class="sub"><span class="pill pw" id="k-pct">—</span></div>
+        <div class="bt"><div class="bf" id="k-bar" style="width:0%"></div></div>
+        <div style="font-size:9px;color:var(--mu);margin-top:4px">Target: <span id="k-tgt">—</span></div>
+      </div>
+      <div class="c">
+        <div class="lbl">Tổng đơn hàng</div>
+        <div class="val" id="k-ord">—</div>
+        <div class="sub"><span class="pill pw" id="k-apd">—</span></div>
+        <div style="display:flex;gap:6px;margin-top:7px">
+          <div class="mini-stat" style="flex:1">
+            <div class="ms-lbl">Ngày cao nhất</div>
+            <div class="ms-val" id="k-pk">—</div>
+            <div style="font-size:8px;color:var(--mu)" id="k-pkd">—</div>
+          </div>
+          <div class="mini-stat" style="flex:1">
+            <div class="ms-lbl">TB/ngày</div>
+            <div class="ms-val" id="k-avg">—</div>
+            <div style="font-size:8px;color:var(--mu)">ngày có đơn</div>
+          </div>
+        </div>
+      </div>
+      <div class="c">
+        <div class="lbl">AOV trung bình</div>
+        <div class="val" id="k-aov">—</div>
+        <div class="sub"><span class="pill pg" id="k-aov-pill">—</span></div>
+        <div class="krow" id="k-aov-det"></div>
+      </div>
+      <div class="c">
+        <div class="lbl" id="k4-lbl">Dự báo EOM</div>
+        <div class="val" id="k4-val">—</div>
+        <div class="sub" id="k4-sub"></div>
+        <div class="krow" id="k4-det"></div>
+      </div>
+    </div>
+
+    <div class="row r211">
+      <div class="c">
+        <div class="sl">% Đóng góp kênh</div>
+        <div style="position:relative;height:130px;display:flex;align-items:center;justify-content:center">
+          <canvas id="dc" role="img" aria-label="Donut kênh GMV">Shopee, Facebook, TikTok, Event</canvas>
+        </div>
+        <div id="donut-leg" style="margin-top:6px"></div>
+        <div style="font-size:8px;color:var(--mu);margin-top:4px;padding:3px 6px;background:var(--bg);border-radius:4px">Website: chưa có dữ liệu</div>
+      </div>
+      <div class="c">
+        <div class="sl">Daily GMV vs Target <span id="cr" style="font-weight:400;color:var(--mu)"></span></div>
+        <div style="position:relative;height:210px">
+          <canvas id="lc" role="img" aria-label="Daily GMV vs target">GMV từng ngày so target.</canvas>
+        </div>
+      </div>
+      <div class="c">
+        <div class="sl">Nhận định</div>
+        <div id="insights-panel"><div style="font-size:10px;color:var(--mu)">Đang phân tích...</div></div>
+      </div>
+    </div>
+
+    <div class="row r31">
+      <div class="c">
+        <div class="sl">Đơn hàng theo ngày</div>
+        <div style="position:relative;height:130px">
+          <canvas id="bc" role="img" aria-label="Đơn hàng theo ngày">Số đơn từng ngày.</canvas>
+        </div>
+      </div>
+      <div class="c">
+        <div class="sl">Tỉ lệ hủy & hoàn (Shopee)</div>
+        <div id="cancel-panel"><div style="font-size:10px;color:var(--mu)">Chọn tháng để xem...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKU -->
+  <div class="panel" id="tab-sku">
+    <div class="row r22">
+      <div class="c">
+        <div class="sl">Top SKU — GMV & % Đóng góp</div>
+        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+          <span style="font-size:9px;color:var(--mu)">Kênh:</span>
+          <select id="sku-ch" onchange="renderSku()">
+            <option value="all">Tất cả</option>
+            <option value="Shopee">Shopee</option>
+            <option value="Facebook">Facebook</option>
+            <option value="Tiktok">TikTok</option>
+            <option value="Event">Event</option>
+          </select>
+        </div>
+        <div id="sku-list"></div>
+      </div>
+      <div class="c">
+        <div class="sl">% Đóng góp theo Màu sắc</div>
+        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+          <span style="font-size:9px;color:var(--mu)">SP:</span>
+          <select id="sel-c" onchange="renderColor()" style="flex:1;max-width:210px"></select>
+        </div>
+        <div id="color-list"></div>
+      </div>
+    </div>
+    <div class="row r22">
+      <div class="c">
+        <div class="sl">% Đóng góp theo Size</div>
+        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+          <span style="font-size:9px;color:var(--mu)">SP:</span>
+          <select id="sel-s" onchange="renderSize()" style="flex:1;max-width:210px"></select>
+        </div>
+        <div id="size-list"></div>
+      </div>
+      <div class="c">
+        <div class="sl">Gender Split</div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <div style="position:relative;width:110px;height:110px;flex-shrink:0">
+            <canvas id="gc" role="img" aria-label="Gender donut">Bé gái, Bé trai, Unisex</canvas>
+          </div>
+          <div id="gender-leg"></div>
+        </div>
+        <div class="sl" style="margin-top:12px">% Đóng góp kênh (tháng hiện tại)</div>
+        <div style="position:relative;height:100px">
+          <canvas id="chb" role="img" aria-label="Channel bar">Shopee, Facebook, TikTok, Event</canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── CONFIG ── */
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+/* ── STATE ── */
+let D = {};
+let CH_DAYS = {};
+let SKU = [];
+let fromDate = '', toDate = '', activeCh = 'all';
+let lineChart, donutChart, barChart, chBarChart, genderChart;
+let skuInit = false;
+
+const fmt = v => !v&&v!==0?'₫0':Math.abs(v)>=1e9?'₫'+(v/1e9).toFixed(1)+'B':Math.abs(v)>=1e6?'₫'+(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e3?'₫'+(v/1e3).toFixed(0)+'K':'₫'+Math.round(v);
+const pct = (v,t) => t>0?(v/t*100).toFixed(1)+'%':'0%';
+const CP = ['#D99A7A','#6B4F3F','#F3C6B8','#8B7355','#9C7C6E','#EAD8C0','#C8A882','#B8927A'];
+const CH_COLORS = {Shopee:'#D99A7A', Facebook:'#6B4F3F', Tiktok:'#F3C6B8', Event:'#8B7355'};
+const MONTHS_VI = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+
+/* ── LOAD DATA ── */
+async function loadData() {
+  document.getElementById('ls').style.display = 'flex';
+  document.getElementById('mw').style.display = 'none';
+  setMsg('Đang kết nối Google Sheets...');
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    showErr('Chưa cấu hình Apps Script URL',
+      'Mở file HTML → tìm APPS_SCRIPT_URL → dán URL của bạn vào.');
+    return;
+  }
+  try {
+    setMsg('Đang tải dữ liệu từ Google Sheets...');
+    const res = await fetch(APPS_SCRIPT_URL);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    D = await res.json();
+    if (D.error) throw new Error(D.error);
+    setMsg('Đang xử lý và render...');
+    processData();
+    initDashboard();
+    document.getElementById('lupd').textContent = new Date().toLocaleTimeString('vi-VN');
+    document.getElementById('ls').style.display = 'none';
+    document.getElementById('mw').style.display = 'block';
+  } catch(err) {
+    showErr('Lỗi kết nối', err.message+'<br><br>Kiểm tra: (1) URL đúng (2) Deploy đúng cách (3) Who has access = Anyone');
+  }
+}
+function setMsg(m){document.getElementById('lmsg').textContent=m;}
+function showErr(t,b){document.getElementById('ls').innerHTML=`<div class="err-box"><h3>${t}</h3><p>${b}</p></div>`;}
+
+/* ── PROCESS DATA ── */
+function processData() {
+  SKU = D.sku || [];
+  const fbMap={}, spMap={}, ttMap={}, evMap={};
+  (D.facebook||[]).forEach(r=>fbMap[r.date]=r);
+  (D.shopee||[]).forEach(r=>spMap[r.date]=r);
+  (D.tiktok||[]).forEach(r=>ttMap[r.date]=r);
+  (D.event||[]).forEach(r=>evMap[r.date]=r);
+
+  CH_DAYS = {
+    all: (D.daily||[]).map(r=>({d:r.date, lb:lbl(r.date), gmv:r.gmv, tgt:r.target, ord:r.orders})),
+    Shopee: Object.values(spMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,cancelOrder:r.cancelOrder,cancelGmv:r.cancelGmv,returnOrder:r.returnOrder,returnGmv:r.returnGmv,newCust:r.newCust,shopTab:r.shopTab})).sort((a,b)=>a.d>b.d?1:-1),
+    Facebook: Object.values(fbMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,ads:r.ads,cir:r.cir,leads:r.leads})).sort((a,b)=>a.d>b.d?1:-1),
+    Tiktok: Object.values(ttMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,shopTab:r.shopTab,video:r.video,live:r.live})).sort((a,b)=>a.d>b.d?1:-1),
+    Event: Object.values(evMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders})).sort((a,b)=>a.d>b.d?1:-1),
+  };
+}
+
+function lbl(d){if(!d)return'';const p=d.split('-');return parseInt(p[2])+'/'+parseInt(p[1]);}
+
+/* ── MONTH SELECTOR ── */
+function buildMonthSelector() {
+  const dates = [...new Set((D.daily||[]).map(r=>r.date.slice(0,7)))].sort();
+  const sel = document.getElementById('f-month');
+  const now = new Date();
+  const curYM = now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0');
+  sel.innerHTML = '';
+  // Only months that have data
+  dates.forEach(ym => {
+    const [y,m] = ym.split('-');
+    const opt = document.createElement('option');
+    opt.value = ym;
+    opt.textContent = MONTHS_VI[parseInt(m)-1] + ' ' + y;
+    if (ym === curYM || ym === dates[dates.length-1]) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  setDateRangeFromMonth(sel.value);
+}
+
+function setDateRangeFromMonth(ym) {
+  const [y,m] = ym.split('-').map(Number);
+  const firstDay = y+'-'+String(m).padStart(2,'0')+'-01';
+  const lastDay = new Date(y,m,0); // last day of month
+  const toD = y+'-'+String(m).padStart(2,'0')+'-'+String(lastDay.getDate()).padStart(2,'0');
+  fromDate = firstDay;
+  toDate = toD;
+  document.getElementById('df').value = fromDate;
+  document.getElementById('dt').value = toDate;
+}
+
+function onMonthChange() {
+  setDateRangeFromMonth(document.getElementById('f-month').value);
+  applyFilters();
+}
+
+function onDateChange() {
+  // When user picks custom date, clear month selector visual but keep it
+  const fi = document.getElementById('df').value;
+  const ti = document.getElementById('dt').value;
+  if (fi) fromDate = fi;
+  if (ti) toDate = ti;
+}
+
+function applyFilters() {
+  const fi=document.getElementById('df').value, ti=document.getElementById('dt').value;
+  if(fi) fromDate=fi; if(ti) toDate=ti;
+  const cn=activeCh==='all'?'Tất cả kênh':activeCh==='Tiktok'?'TikTok':activeCh;
+  const fd=fromDate.slice(8)+'/'+fromDate.slice(5,7), td=toDate.slice(8)+'/'+toDate.slice(5,7);
+  document.getElementById('fn').textContent=fd+' → '+td+' · '+cn;
+  document.getElementById('cr').textContent='('+fd+' – '+td+')';
+  // Update header period
+  const selM = document.getElementById('f-month');
+  document.getElementById('hm-period').textContent = selM.options[selM.selectedIndex]?.textContent || fd+' – '+td;
+  updateOverview();
+}
+
+function setCh(ch,btn){
+  activeCh=ch;
+  document.querySelectorAll('.cp').forEach(b=>b.classList.remove('act'));
+  btn.classList.add('act');
+  applyFilters();
+}
+
+/* ── GET ROWS ── */
+function getRows(){return(CH_DAYS[activeCh]||[]).filter(r=>r.d>=fromDate&&r.d<=toDate);}
+
+/* ── FORECAST LOGIC ──
+   Chỉ tính trên ngày có data thực (gmv > 0) trong khoảng filter
+   Forecast = avg_per_day × tổng_ngày_của_tháng_filter
+   Không dùng totalActual từ monthly sheet (vì có Event)
+*/
+function calcForecast(rows) {
+  const now = new Date();
+  // Ngày trong tháng của fromDate
+  const [fy,fm] = fromDate.split('-').map(Number);
+  const daysInMonth = new Date(fy, fm, 0).getDate();
+  const activeDays = rows.filter(r=>r.gmv>0).length || 1;
+  const totalGMV = rows.reduce((s,r)=>s+r.gmv,0);
+  const avgPerDay = totalGMV / activeDays;
+  const forecast = Math.round(avgPerDay * daysInMonth);
+  return { forecast, activeDays, daysInMonth, avgPerDay };
+}
+
+/* ── UPDATE OVERVIEW ── */
+function updateOverview() {
+  const rows=getRows();
+  const gmvs=rows.map(r=>r.gmv), tgts=rows.map(r=>r.tgt), ords=rows.map(r=>r.ord||0);
+  const labels=rows.map(r=>r.lb);
+  const tGMV=gmvs.reduce((a,b)=>a+b,0);
+  const tTgt=tgts.reduce((a,b)=>a+b,0);
+  const tOrd=ords.reduce((a,b)=>a+b,0);
+  const p=tTgt>0?tGMV/tTgt*100:0;
+  const active=gmvs.filter(v=>v>0).length||1;
+  const peakOrd=Math.max(...ords,0);
+  const peakIdx=ords.indexOf(peakOrd);
+  const tAOV=tOrd>0?Math.round(tGMV/tOrd):0;
+
+  document.getElementById('k-gmv').textContent=fmt(tGMV);
+  document.getElementById('k-pct').textContent=p.toFixed(1)+'% đạt';
+  const pctEl=document.getElementById('k-pct');
+  pctEl.className='pill '+(p>=80?'pg':p>=50?'pw':'pr');
+  document.getElementById('k-bar').style.width=Math.min(p,100)+'%';
+  document.getElementById('k-tgt').textContent=fmt(tTgt);
+  document.getElementById('k-ord').textContent=tOrd;
+  document.getElementById('k-pk').textContent=peakOrd;
+  document.getElementById('k-pkd').textContent=rows[peakIdx]?.lb||'—';
+  document.getElementById('k-avg').textContent=(tOrd/active).toFixed(1);
+  document.getElementById('k-apd').textContent='~'+(tOrd/active).toFixed(1)+'/ngày';
+  document.getElementById('k-aov').textContent=fmt(tAOV);
+
+  // AOV detail
+  const pill=document.getElementById('k-aov-pill');
+  if(activeCh==='all'){
+    pill.textContent='Tất cả kênh';pill.className='pill pg';
+    const spAOV=calcAOV(filterByDate(D.shopee));
+    const fbAOV=calcAOV(filterByDate(D.facebook));
+    const ttAOV=calcAOV(filterByDate(D.tiktok));
+    document.getElementById('k-aov-det').innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Facebook</span><span style="font-weight:700;color:var(--br)">${fmt(fbAOV)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Shopee</span><span style="font-weight:700;color:var(--br)">${fmt(spAOV)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">TikTok</span><span style="font-weight:700;color:var(--br)">${fmt(ttAOV)}</span></div>`;
+  } else {
+    pill.textContent=activeCh==='Tiktok'?'TikTok':activeCh;pill.className='pill pw';
+    const aovs=rows.filter(r=>r.aov>0).map(r=>r.aov);
+    document.getElementById('k-aov-det').innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Cao nhất</span><span style="font-weight:700;color:var(--br)">${fmt(aovs.length?Math.max(...aovs):0)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Thấp nhất</span><span style="font-weight:700;color:var(--br)">${fmt(aovs.length?Math.min(...aovs):0)}</span></div>`;
+  }
+
+  // 4th card
+  renderK4(rows, tGMV, p, tOrd);
+
+  // Charts
+  if(lineChart){lineChart.data.labels=labels;lineChart.data.datasets[0].data=gmvs;lineChart.data.datasets[1].data=tgts;lineChart.update();}
+  if(barChart){barChart.data.labels=labels;barChart.data.datasets[0].data=ords;barChart.data.datasets[0].backgroundColor=ords.map(v=>v>=30?'#6B4F3F':v>=20?'#D99A7A':'#EAD8C0');barChart.update();}
+
+  // Donut — always all channels
+  const spT=filterByDate(D.shopee).reduce((s,r)=>s+r.gmv,0);
+  const fbT=filterByDate(D.facebook).reduce((s,r)=>s+r.gmv,0);
+  const ttT=filterByDate(D.tiktok).reduce((s,r)=>s+r.gmv,0);
+  const evT=filterByDate(D.event).reduce((s,r)=>s+r.gmv,0);
+  const ct=spT+fbT+ttT+evT||1;
+  const chVals=[spT,fbT,ttT,evT];
+  const chNames=['Shopee','Facebook','TikTok','Event'];
+  const chColors=['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'];
+  if(donutChart){donutChart.data.datasets[0].data=chVals;donutChart.update();}
+  document.getElementById('donut-leg').innerHTML=chNames.map((n,i)=>
+    `<div class="leg"><div class="ld" style="background:${chColors[i]}"></div><span style="flex:1">${n}</span><b>${pct(chVals[i],ct)}</b></div>`
+  ).join('');
+
+  // Cancel/Return panel (Shopee only)
+  renderCancelPanel();
+
+  renderInsights(tGMV,p,spT,fbT,ttT,evT,ct);
+}
+
+function filterByDate(arr) {
+  return (arr||[]).filter(r=>r.date>=fromDate&&r.date<=toDate);
+}
+
+function calcAOV(arr) {
+  const gmv=arr.reduce((s,r)=>s+r.gmv,0);
+  const ord=arr.reduce((s,r)=>s+r.orders,0);
+  return ord>0?Math.round(gmv/ord):0;
+}
+
+/* ── K4 CARD ── */
+function renderK4(rows, tGMV, p, tOrd) {
+  const lbl=document.getElementById('k4-lbl');
+  const val=document.getElementById('k4-val');
+  const sub=document.getElementById('k4-sub');
+  const det=document.getElementById('k4-det');
+
+  if(activeCh==='all'){
+    // Forecast EOM — dùng daily data trong tháng filter
+    lbl.textContent='Dự báo EOM';
+    const {forecast, activeDays, daysInMonth, avgPerDay} = calcForecast(rows);
+    const mTgt = (D.monthly?.totalTarget)||0;
+    const fp = mTgt>0?forecast/mTgt*100:0;
+    val.textContent=fmt(forecast);
+    val.style.color=fp>=80?'var(--br)':fp>=50?'var(--wa)':'var(--da)';
+    sub.innerHTML=`<span class="pill ${fp>=80?'pg':fp>=50?'pw':'pr'}">${fp.toFixed(1)}% target</span>`;
+    det.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Avg/ngày</span><span style="font-weight:700;color:var(--br)">${fmt(Math.round(avgPerDay))}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Ngày có data</span><span style="font-weight:700;color:var(--br)">${activeDays}/${daysInMonth} ngày</span></div>
+      <div class="kline"><span style="color:var(--mu)">Gap vs target</span><span style="font-weight:700;color:var(--da)">${fmt(Math.max(0,mTgt-forecast))}</span></div>`;
+  } else if(activeCh==='Shopee'){
+    lbl.textContent='Shopee — Traffic';
+    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
+    const avgCR=(rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0)*100).toFixed(2);
+    const newC=rows.reduce((s,r)=>s+(r.newCust||0),0);
+    val.textContent=tVis.toLocaleString('vi-VN');val.style.color='var(--br)';
+    sub.innerHTML=`<span class="pill pg">Visitors</span>`;
+    det.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${avgCR}%</span></div>
+      <div class="kline"><span style="color:var(--mu)">Khách mới</span><span style="font-weight:700;color:var(--br)">${newC.toLocaleString('vi-VN')}</span></div>`;
+  } else if(activeCh==='Facebook'){
+    lbl.textContent='Facebook — Ads';
+    const tAds=rows.reduce((s,r)=>s+(r.ads||0),0);
+    const gmv=rows.reduce((s,r)=>s+r.gmv,0);
+    const cir=gmv>0?tAds/gmv*100:0;
+    const roas=tAds>0?gmv/tAds:0;
+    const leads=rows.reduce((s,r)=>s+(r.leads||0),0);
+    val.textContent=fmt(tAds);val.style.color=cir>30?'var(--da)':'var(--wa)';
+    sub.innerHTML=`<span class="pill ${cir>30?'pr':'pw'}">CIR ${cir.toFixed(1)}%</span>`;
+    det.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">ROAS</span><span style="font-weight:700;color:var(--br)">${roas.toFixed(2)}x</span></div>
+      <div class="kline"><span style="color:var(--mu)">Tổng leads</span><span style="font-weight:700;color:var(--br)">${leads.toLocaleString('vi-VN')}</span></div>
+      <div class="kline"><span style="color:var(--mu)">GMV/₫1 Ads</span><span style="font-weight:700;color:${roas>=3?'var(--su)':'var(--da)'}">₫${roas.toFixed(1)}</span></div>`;
+  } else if(activeCh==='Tiktok'){
+    lbl.textContent='TikTok — Traffic';
+    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
+    const avgCR=rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0).toFixed(2);
+    const shopTab=rows.reduce((s,r)=>s+(r.shopTab||0),0);
+    val.textContent=tVis.toLocaleString('vi-VN');val.style.color='var(--br)';
+    sub.innerHTML=`<span class="pill pw">Visitors</span>`;
+    det.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${avgCR}%</span></div>
+      <div class="kline"><span style="color:var(--mu)">Shop Tab</span><span style="font-weight:700;color:var(--br)">${fmt(shopTab)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Ngày active</span><span style="font-weight:700;color:var(--br)">${rows.length} ngày</span></div>`;
+  } else if(activeCh==='Event'){
+    lbl.textContent='Event';
+    const evTgt=D.monthly?.eventTarget||0;
+    const evAct=D.monthly?.eventActual||0;
+    const evPct=evTgt>0?evAct/evTgt*100:0;
+    val.textContent=fmt(evAct);val.style.color='var(--br)';
+    sub.innerHTML=`<span class="pill ${evPct>=80?'pg':'pw'}">${evPct.toFixed(1)}% target</span>`;
+    det.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Target</span><span style="font-weight:700;color:var(--br)">${fmt(evTgt)}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Gap</span><span style="font-weight:700;color:var(--da)">${fmt(Math.max(0,evTgt-evAct))}</span></div>`;
+  }
+}
+
+/* ── CANCEL / RETURN PANEL ── */
+function renderCancelPanel() {
+  const spRows = filterByDate(D.shopee);
+  const el = document.getElementById('cancel-panel');
+  if(!spRows.length){el.innerHTML='<div style="font-size:10px;color:var(--mu)">Không có dữ liệu Shopee trong khoảng này.</div>';return;}
+  const tGMV = spRows.reduce((s,r)=>s+r.gmv,0)||1;
+  const tOrd = spRows.reduce((s,r)=>s+r.orders,0)||1;
+  const cancelGMV = spRows.reduce((s,r)=>s+(r.cancelGmv||0),0);
+  const cancelOrd = spRows.reduce((s,r)=>s+(r.cancelOrder||0),0);
+  const returnGMV = spRows.reduce((s,r)=>s+(r.returnGmv||0),0);
+  const returnOrd = spRows.reduce((s,r)=>s+(r.returnOrder||0),0);
+  const cancelRate = (cancelGMV/tGMV*100).toFixed(1);
+  const returnRate = (returnGMV/tGMV*100).toFixed(1);
+  const cancelOrdRate = (cancelOrd/tOrd*100).toFixed(1);
+  const returnOrdRate = (returnOrd/tOrd*100).toFixed(1);
+  el.innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+      <div class="mini-stat">
+        <div class="ms-lbl">Tỉ lệ hủy (GMV)</div>
+        <div class="ms-val" style="color:${parseFloat(cancelRate)>10?'var(--da)':'var(--wa)'}">${cancelRate}%</div>
+        <div style="font-size:8px;color:var(--mu)">${fmt(cancelGMV)}</div>
+      </div>
+      <div class="mini-stat">
+        <div class="ms-lbl">Tỉ lệ hủy (đơn)</div>
+        <div class="ms-val" style="color:${parseFloat(cancelOrdRate)>10?'var(--da)':'var(--wa)'}">${cancelOrdRate}%</div>
+        <div style="font-size:8px;color:var(--mu)">${cancelOrd} đơn</div>
+      </div>
+      <div class="mini-stat">
+        <div class="ms-lbl">Tỉ lệ hoàn (GMV)</div>
+        <div class="ms-val" style="color:${parseFloat(returnRate)>5?'var(--da)':'var(--su)'}">${returnRate}%</div>
+        <div style="font-size:8px;color:var(--mu)">${fmt(returnGMV)}</div>
+      </div>
+      <div class="mini-stat">
+        <div class="ms-lbl">Tỉ lệ hoàn (đơn)</div>
+        <div class="ms-val" style="color:${parseFloat(returnOrdRate)>5?'var(--da)':'var(--su)'}">${returnOrdRate}%</div>
+        <div style="font-size:8px;color:var(--mu)">${returnOrd} đơn</div>
+      </div>
+    </div>
+    <div style="font-size:8px;color:var(--mu);margin-top:5px;padding:3px 6px;background:var(--bg);border-radius:4px">Chỉ tính cho kênh Shopee · Tỉ lệ hủy >10% = cảnh báo đỏ</div>`;
+}
+
+/* ── INSIGHTS ── */
+function renderInsights(gmv,p,sp,fb,tt,ev,tot){
+  let h=`<div class="isec" style="color:var(--su);margin-top:0">Tích cực</div>`;
+  if(activeCh==='all'){
+    if(sp>fb) h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Shopee chiếm ${pct(sp,tot)} GMV — organic mạnh</div></div>`;
+    if(ev>0) h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Event offline đóng góp ${pct(ev,tot)} — kênh B2B đang hoạt động</div></div>`;
+  }
+  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">AOV Facebook cao nhất — khách có giá trị đơn tốt</div></div>`;
+  if(activeCh==='Tiktok') h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">TikTok CR cao nhất khi có livestream — nhân rộng</div></div>`;
+  h+=`<div class="isec" style="color:var(--da)">Rủi ro</div>`;
+  if(p<80) h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">GMV ${p.toFixed(1)}% target — dưới ngưỡng 80%</div></div>`;
+  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">Kiểm tra CIR — >30% nhiều ngày cho thấy ads kém hiệu quả</div></div>`;
+  if(activeCh==='all'&&tt/tot<0.1) h+=`<div class="ir"><div class="id" style="background:var(--wa)"></div><div class="it">TikTok chỉ ${pct(tt,tot)} GMV — kênh chưa khai thác hết</div></div>`;
+  h+=`<div class="isec" style="color:var(--br)">Hành động</div>`;
+  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Pause nhóm ads CIR >30%, tập trung ngày AOV cao</div></div>`;
+  else if(activeCh==='Tiktok') h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Livestream đều đặn — nhân mô hình ngày có CR cao</div></div>`;
+  else h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Flash sale Shopee cuối tháng — push top SKU</div></div>`;
+  document.getElementById('insights-panel').innerHTML=h;
+}
+
+/* ── CHARTS ── */
+function initCharts(){
+  donutChart=new Chart(document.getElementById('dc'),{
+    type:'doughnut',
+    data:{labels:['Shopee','Facebook','TikTok','Event'],datasets:[{data:[0,0,0,0],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'],borderWidth:0,hoverOffset:3}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,c.dataset.data.reduce((a,b)=>a+b,0))}}}}
+  });
+  lineChart=new Chart(document.getElementById('lc'),{
+    type:'line',
+    data:{labels:[],datasets:[
+      {label:'GMV',data:[],borderColor:'#D99A7A',backgroundColor:'rgba(217,154,122,0.1)',fill:true,tension:0.35,pointRadius:2,borderWidth:2},
+      {label:'Target',data:[],borderColor:'#C8A882',backgroundColor:'transparent',tension:0,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}}}}
+  });
+  barChart=new Chart(document.getElementById('bc'),{
+    type:'bar',
+    data:{labels:[],datasets:[{label:'Đơn',data:[],backgroundColor:[],borderRadius:3,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' đơn'}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}}}}
+  });
+}
+
+/* ── INIT DASHBOARD ── */
+function initDashboard(){
+  initCharts();
+  buildMonthSelector();
+  applyFilters();
+}
+
+/* ── TABS ── */
+function switchTab(t,btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  btn.classList.add('act');document.getElementById('tab-'+t).classList.add('act');
+  if(t==='sku') initSkuTab();
+}
+
+/* ── SKU TAB ── */
+function initSkuTab(){
+  if(skuInit)return;skuInit=true;
+  const s1=document.getElementById('sel-c'),s2=document.getElementById('sel-s');
+  s1.innerHTML='<option value="all">Tất cả sản phẩm</option>';
+  s2.innerHTML='<option value="all">Tất cả sản phẩm</option>';
+  SKU.forEach(s=>{s1.innerHTML+=`<option value="${s.name}">${s.name}</option>`;s2.innerHTML+=`<option value="${s.name}">${s.name}</option>`;});
+
+  // Gender donut
+  const gMap={Girl:0,Boy:0,Unisex:0};
+  SKU.forEach(s=>{if(s.gender)Object.entries(s.gender).forEach(([k,v])=>{if(gMap[k]!==undefined)gMap[k]+=v;});});
+  const gTot=Object.values(gMap).reduce((a,b)=>a+b,0)||1;
+  genderChart=new Chart(document.getElementById('gc'),{
+    type:'doughnut',
+    data:{labels:['Bé gái','Bé trai','Unisex'],datasets:[{data:[gMap.Girl,gMap.Boy,gMap.Unisex],backgroundColor:['#D99A7A','#6B4F3F','#EAD8C0'],borderWidth:0,hoverOffset:3}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,gTot)+' · '+fmt(c.parsed)}}}}
+  });
+  document.getElementById('gender-leg').innerHTML=['Bé gái','Bé trai','Unisex'].map((n,i)=>
+    `<div class="leg"><div class="ld" style="background:${['#D99A7A','#6B4F3F','#EAD8C0'][i]}"></div><span style="flex:1">${n}</span><b>${pct([gMap.Girl,gMap.Boy,gMap.Unisex][i],gTot)}</b></div>`
+  ).join('')+`<div style="margin-top:5px;font-size:9px;color:var(--mu)">Tổng: ${fmt(gTot)}</div>`;
+
+  // Channel bar — dùng monthly actuals
+  const m=D.monthly||{};
+  const spA=m.shopeeActual||0,fbA=m.fbActual||0,ttA=m.tiktokActual||0,evA=m.eventActual||0;
+  chBarChart=new Chart(document.getElementById('chb'),{
+    type:'bar',
+    data:{labels:['Shopee','Facebook','TikTok','Event'],datasets:[{data:[spA,fbA,ttA,evA],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'],borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x)+' ('+pct(c.parsed.x,spA+fbA+ttA+evA)+')'}}},
+      scales:{x:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#3A2A20'}}}}
+  });
+  renderSku();renderColor();renderSize();
+}
+
+function renderSku(){
+  const ch=document.getElementById('sku-ch').value;
+  const sorted=[...SKU].sort((a,b)=>(b.gmv_ch?.[ch]||b.gmv_all)-(a.gmv_ch?.[ch]||a.gmv_all));
+  const tot=sorted.reduce((s,r)=>s+(r.gmv_ch?.[ch]||r.gmv_all),0)||1;
+  const max=(sorted[0]?.gmv_ch?.[ch]||sorted[0]?.gmv_all)||1;
+  document.getElementById('sku-list').innerHTML=sorted.slice(0,12).map((s,i)=>{
+    const v=s.gmv_ch?.[ch]||s.gmv_all;
+    return`<div class="sr"><span style="font-size:9px;color:var(--mu);min-width:14px;font-weight:700">${i+1}</span><span class="sn">${s.name}</span><div class="st2"><div class="sf2" style="width:${Math.round(v/max*100)}%"></div></div><span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`;
+  }).join('');
+}
+function renderBars(id,obj){
+  const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
+  const tot=entries.reduce((s,[,v])=>s+v,0)||1,max=entries[0]?.[1]||1;
+  document.getElementById(id).innerHTML=entries.map(([k,v],i)=>
+    `<div class="sr"><div style="width:8px;height:8px;border-radius:2px;background:${CP[i%CP.length]};flex-shrink:0"></div><span class="sn">${k}</span><div class="st2" style="width:55px"><div class="sf2" style="width:${Math.round(v/max*100)}%;background:${CP[i%CP.length]}"></div></div><span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`
+  ).join('');
+}
+function renderColor(){const sel=document.getElementById('sel-c').value;let d={};if(sel==='all')SKU.forEach(s=>Object.entries(s.colors||{}).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU.find(s=>s.name===sel);if(f)d=f.colors||{};}renderBars('color-list',d);}
+function renderSize(){const sel=document.getElementById('sel-s').value;let d={};if(sel==='all')SKU.forEach(s=>Object.entries(s.sizes||{}).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU.find(s=>s.name===sel);if(f)d=f.sizes||{};}renderBars('size-list',d);}
+
+/* ── START ── */
+loadData();
+</script>
+</body>
+</html>
