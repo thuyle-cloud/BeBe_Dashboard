@@ -6,80 +6,122 @@
 <title>BéBé — Performance Dashboard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — BéBé Brand
+═══════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#FFF8F1;--card:#fff;--br:#6B4F3F;--be:#EAD8C0;--pe:#D99A7A;--bl:#F3C6B8;--mu:#9C7C6E;--tx:#3A2A20;--su:#6F8F72;--wa:#D8A23A;--da:#C94C4C}
+:root{
+  --bg:#FFF8F1;--card:#fff;--br:#6B4F3F;--be:#EAD8C0;--pe:#D99A7A;
+  --bl:#F3C6B8;--mu:#9C7C6E;--tx:#3A2A20;--su:#6F8F72;--wa:#D8A23A;--da:#C94C4C;
+  --su-bg:#E8F3E9;--wa-bg:#FDF3E0;--da-bg:#FCE8E8;
+  --sp:#D99A7A;--fb:#6B4F3F;--tt:#F3C6B8;--ev:#8B7355;--wb:#A8C4D4;
+}
 body{background:var(--bg);font-family:system-ui,-apple-system,sans-serif;color:var(--tx);font-size:12px}
-
 /* LOADING */
-#ls{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px}
-.lb{font-size:38px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:2px}
-.spin{width:28px;height:28px;border:3px solid var(--bl);border-top-color:var(--pe);border-radius:50%;animation:spin .8s linear infinite}
+#ls{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;transition:opacity 0.3s}
+#ls.hidden{opacity:0;pointer-events:none}
+.lb{font-size:40px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:2px}
+.spin{width:32px;height:32px;border:3px solid var(--bl);border-top-color:var(--pe);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .lmsg{font-size:11px;color:var(--mu)}
-.err-box{background:#FCE8E8;border:1px solid #f5c6c6;border-radius:12px;padding:18px 24px;max-width:460px;text-align:center}
-.err-box h3{color:var(--da);margin-bottom:8px;font-size:13px}
+.err-box{background:var(--da-bg);border:1px solid #f5c6c6;border-radius:12px;padding:20px 28px;max-width:500px;text-align:center}
+.err-box h3{color:var(--da);margin-bottom:8px;font-size:14px}
 .err-box p{color:#8b3a3a;font-size:11px;line-height:1.7}
-
 /* LAYOUT */
-.wrap{padding:10px;display:none}
-.hdr{background:#fff;border-radius:12px;padding:9px 14px;display:flex;align-items:center;gap:10px;margin-bottom:8px;border:1px solid var(--bl);flex-wrap:wrap}
-.brand{font-size:19px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:1px}
-.hm{flex:1;font-size:10px;color:var(--mu)}
-.upd{font-size:9px;color:var(--mu);background:var(--bg);padding:3px 9px;border-radius:20px;border:1px solid var(--be)}
-.rfbtn{font-size:9px;padding:3px 10px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer}
-
+.wrap{padding:10px;min-height:100vh}
+/* HEADER */
+.hdr{background:#fff;border-radius:12px;padding:10px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;border:1px solid var(--bl);flex-wrap:wrap}
+.brand{font-size:20px;font-weight:700;color:var(--br);font-style:italic;letter-spacing:1px}
+.hdr-title{flex:1;font-size:11px;color:var(--mu)}
+.upd-pill{font-size:9px;color:var(--mu);background:var(--bg);padding:3px 9px;border-radius:20px;border:1px solid var(--be);white-space:nowrap}
+.rfbtn{font-size:9px;padding:4px 12px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer;transition:opacity .15s}
+.rfbtn:hover{opacity:.8}
 /* FILTERS */
-.fb{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}
+.filter-section{background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:8px;border:1px solid var(--bl);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .fl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
 select{font-size:10px;font-family:inherit;padding:4px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;outline:none}
-input[type=date]{font-size:10px;padding:3px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);font-family:inherit;cursor:pointer;outline:none}
-.sep{color:var(--be);font-size:11px}
-.abtn{font-size:10px;padding:4px 12px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer;font-weight:600}
-.cp{font-size:10px;padding:4px 11px;border-radius:20px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;transition:all .15s}
-.cp.act{background:var(--pe);color:#fff;border-color:var(--pe)}
+input[type=date]{font-size:10px;padding:4px 8px;border-radius:8px;border:1px solid var(--be);background:var(--bg);color:var(--br);font-family:inherit;cursor:pointer;outline:none}
+.sep{color:var(--mu);font-size:11px}
+.abtn{font-size:10px;padding:4px 14px;border-radius:20px;background:var(--br);color:#fff;border:none;cursor:pointer;font-weight:600}
+.ch-pill{font-size:10px;padding:4px 11px;border-radius:20px;border:1px solid var(--be);background:var(--bg);color:var(--br);cursor:pointer;font-weight:600;transition:all .15s}
+.ch-pill.act{color:#fff;border-color:transparent}
+.ch-all.act{background:var(--br)}
+.ch-sp.act{background:var(--sp)}
+.ch-fb.act{background:var(--fb)}
+.ch-tt.act{background:#9C7C6E}
+.ch-ev.act{background:var(--ev)}
+.ch-wb.act{background:var(--wb)}
 .fn{font-size:9px;color:var(--mu)}
-
 /* TABS */
 .tabs{display:flex;gap:4px;margin-bottom:8px}
-.tab{padding:6px 16px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--be);background:#fff;color:var(--mu)}
+.tab{padding:6px 18px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--be);background:#fff;color:var(--mu);transition:all .15s}
 .tab.act{background:var(--br);color:#fff;border-color:var(--br)}
 .panel{display:none}.panel.act{display:block}
-
 /* GRID */
 .row{display:grid;gap:8px;margin-bottom:8px}
 .r4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.r5{grid-template-columns:repeat(5,minmax(0,1fr))}
+.r3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.r2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .r211{grid-template-columns:minmax(0,1fr) minmax(0,2fr) minmax(0,1fr)}
 .r31{grid-template-columns:minmax(0,3fr) minmax(0,1fr)}
+.r13{grid-template-columns:minmax(0,1fr) minmax(0,3fr)}
 .r22{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-@media(max-width:900px){.r4{grid-template-columns:repeat(2,1fr)}.r211,.r31,.r22{grid-template-columns:1fr}}
-
+@media(max-width:1100px){.r5{grid-template-columns:repeat(3,1fr)}.r4{grid-template-columns:repeat(2,1fr)}.r211,.r31,.r13,.r22{grid-template-columns:1fr}.r3{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:700px){.r5,.r4,.r3,.r2{grid-template-columns:1fr}}
 /* CARDS */
-.c{background:#fff;border-radius:12px;padding:11px 13px;border:1px solid rgba(217,154,122,.18)}
-.lbl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:3px}
-.val{font-size:22px;font-weight:700;color:var(--br);line-height:1}
-.sub{font-size:10px;color:var(--mu);margin-top:4px;display:flex;align-items:center;gap:5px}
-.pill{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700}
-.pg{background:#E8F3E9;color:var(--su)}.pw{background:#FDF3E0;color:var(--wa)}.pr{background:#FCE8E8;color:var(--da)}
+.c{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid rgba(217,154,122,.18);transition:box-shadow .2s}
+.c:hover{box-shadow:0 2px 12px rgba(107,79,63,.08)}
+.lbl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px}
+.val{font-size:22px;font-weight:700;color:var(--br);line-height:1.1}
+.val-sm{font-size:16px;font-weight:700;color:var(--br);line-height:1.1}
+.sub{font-size:10px;color:var(--mu);margin-top:4px;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.pill{padding:2px 7px;border-radius:10px;font-size:9px;font-weight:700;white-space:nowrap}
+.pg{background:var(--su-bg);color:var(--su)}
+.pw{background:var(--wa-bg);color:var(--wa)}
+.pr{background:var(--da-bg);color:var(--da)}
+.pn{background:#F0F0F0;color:#888}
 .bt{background:var(--bl);border-radius:4px;height:5px;margin-top:6px;overflow:hidden}
-.bf{height:100%;background:var(--pe);border-radius:4px;transition:width .4s}
+.bf{height:100%;background:var(--pe);border-radius:4px;transition:width .5s ease}
 .sl{font-size:9px;color:var(--mu);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
 .leg{display:flex;align-items:center;gap:5px;margin-bottom:4px;font-size:10px}
 .ld{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .sr{display:flex;align-items:center;gap:5px;margin-bottom:5px}
 .sn{flex:1;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st2{width:48px;background:var(--bl);border-radius:3px;height:4px;flex-shrink:0}
-.sf2{height:100%;background:var(--pe);border-radius:3px}
-.sv{font-size:10px;color:var(--br);font-weight:700;width:40px;text-align:right;flex-shrink:0}
-.sp2{font-size:9px;color:var(--mu);width:32px;text-align:right;flex-shrink:0}
+.st{width:50px;background:var(--bl);border-radius:3px;height:4px;flex-shrink:0}
+.sf{height:100%;background:var(--pe);border-radius:3px}
+.sv{font-size:10px;color:var(--br);font-weight:700;width:42px;text-align:right;flex-shrink:0}
+.sp2{font-size:9px;color:var(--mu);width:34px;text-align:right;flex-shrink:0}
 .krow{display:flex;flex-direction:column;gap:3px;margin-top:7px}
-.kline{display:flex;justify-content:space-between;font-size:9px}
-.ir{display:flex;gap:5px;margin-bottom:5px;align-items:flex-start}
-.id{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
-.it{font-size:10px;line-height:1.4}
-.isec{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:3px;margin-top:7px}
-.mini-stat{background:var(--bg);border-radius:6px;padding:5px 8px}
-.ms-lbl{font-size:8px;color:var(--mu)}
-.ms-val{font-size:13px;font-weight:700;color:var(--br)}
+.kline{display:flex;justify-content:space-between;font-size:9px;gap:4px}
+.kv{font-weight:700;color:var(--br)}
+.mini-stat{background:var(--bg);border-radius:8px;padding:6px 10px;flex:1}
+.ms-lbl{font-size:8px;color:var(--mu);margin-bottom:2px}
+.ms-val{font-size:14px;font-weight:700;color:var(--br)}
+/* INSIGHT */
+.ir{display:flex;gap:6px;margin-bottom:6px;align-items:flex-start}
+.id{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3.5px}
+.it{font-size:10px;line-height:1.45;color:var(--tx)}
+.isec{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:4px;margin-top:8px;padding-bottom:3px;border-bottom:1px solid var(--bl)}
+/* CHANNEL CARDS */
+.ch-card{background:#fff;border-radius:12px;padding:12px 14px;border:1px solid rgba(217,154,122,.18)}
+.ch-card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.ch-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ch-name{font-size:12px;font-weight:700;color:var(--tx)}
+.ch-status{font-size:9px;padding:2px 7px;border-radius:10px}
+.awaiting{background:#F0F0F0;color:#888}
+.synced{background:var(--su-bg);color:var(--su)}
+.ch-metrics{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.ch-metric{background:var(--bg);border-radius:7px;padding:6px 8px}
+.cml{font-size:8px;color:var(--mu);margin-bottom:1px}
+.cmv{font-size:12px;font-weight:700;color:var(--br)}
+/* BADGE TRENDS */
+.trend-up{color:var(--su);font-size:9px}
+.trend-dn{color:var(--da);font-size:9px}
+.trend-fl{color:var(--mu);font-size:9px}
+/* SECTION HEADER */
+.sec-hdr{font-size:11px;font-weight:700;color:var(--br);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bl);display:flex;align-items:center;gap:6px}
+.sec-hdr span{font-size:9px;color:var(--mu);font-weight:400}
 </style>
 </head>
 <body>
@@ -91,623 +133,1014 @@ input[type=date]{font-size:10px;padding:3px 8px;border-radius:8px;border:1px sol
   <div class="lmsg" id="lmsg">Đang kết nối Google Sheets...</div>
 </div>
 
-<!-- DASHBOARD -->
-<div class="wrap" id="mw">
+<div class="wrap" id="mw" style="display:none">
+
+  <!-- HEADER -->
   <div class="hdr">
     <div class="brand">bébé</div>
-    <div class="hm">Performance Dashboard · <span id="hm-period">—</span></div>
-    <div class="upd">Cập nhật: <span id="lupd">—</span></div>
+    <div class="hdr-title">Performance Dashboard · <span id="hm-period">—</span></div>
+    <div class="upd-pill">Cập nhật: <span id="lupd">—</span></div>
     <button class="rfbtn" onclick="loadData()">↻ Refresh</button>
   </div>
 
   <!-- FILTERS -->
-  <div class="fb">
+  <div class="filter-section">
     <span class="fl">Tháng:</span>
     <select id="f-month" onchange="onMonthChange()"></select>
-    <span class="fl" style="margin-left:8px">Ngày:</span>
-    <input type="date" id="df" onchange="onDateChange()">
+    <span class="fl" style="margin-left:6px">Ngày:</span>
+    <input type="date" id="df" onchange="clearMonthPreset()">
     <span class="sep">→</span>
-    <input type="date" id="dt" onchange="onDateChange()">
+    <input type="date" id="dt" onchange="clearMonthPreset()">
     <button class="abtn" onclick="applyFilters()">Áp dụng</button>
+    <div style="flex:1;min-width:0"></div>
+    <span class="fl">Kênh:</span>
+    <button class="ch-pill ch-all act" onclick="setCh('all',this)">Tất cả</button>
+    <button class="ch-pill ch-sp" onclick="setCh('Shopee',this)">Shopee</button>
+    <button class="ch-pill ch-fb" onclick="setCh('Facebook',this)">Facebook</button>
+    <button class="ch-pill ch-tt" onclick="setCh('Tiktok',this)">TikTok</button>
+    <button class="ch-pill ch-ev" onclick="setCh('Event',this)">Event</button>
+    <button class="ch-pill ch-wb" onclick="setCh('Website',this)">Website</button>
     <span class="fn" id="fn">—</span>
   </div>
-  <div class="fb">
-    <span class="fl">Kênh:</span>
-    <button class="cp act" onclick="setCh('all',this)">Tất cả</button>
-    <button class="cp" onclick="setCh('Shopee',this)">Shopee</button>
-    <button class="cp" onclick="setCh('Facebook',this)">Facebook</button>
-    <button class="cp" onclick="setCh('Tiktok',this)">TikTok</button>
-    <button class="cp" onclick="setCh('Event',this)">Event</button>
-  </div>
 
+  <!-- TABS -->
   <div class="tabs">
     <div class="tab act" onclick="switchTab('ov',this)">Overview</div>
+    <div class="tab" onclick="switchTab('channel',this)">Channel Performance</div>
     <div class="tab" onclick="switchTab('sku',this)">SKU Performance</div>
+    <div class="tab" onclick="switchTab('insight',this)">Nhận Định</div>
   </div>
 
-  <!-- OVERVIEW -->
+  <!-- ══════════════════════════════
+       TAB: OVERVIEW
+  ══════════════════════════════ -->
   <div class="panel act" id="tab-ov">
-    <div class="row r4">
+
+    <!-- ROW 1: Core KPIs -->
+    <div class="row r5">
       <div class="c">
         <div class="lbl">Total GMV</div>
         <div class="val" id="k-gmv">—</div>
-        <div class="sub"><span class="pill pw" id="k-pct">—</span></div>
+        <div class="sub"><span class="pill" id="k-ach-pill">—</span><span id="k-ach-lbl">—</span></div>
         <div class="bt"><div class="bf" id="k-bar" style="width:0%"></div></div>
-        <div style="font-size:9px;color:var(--mu);margin-top:4px">Target: <span id="k-tgt">—</span></div>
+        <div class="krow">
+          <div class="kline"><span style="color:var(--mu)">Target</span><span class="kv" id="k-tgt">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">MOM</span><span id="k-mom" class="kv">—</span></div>
+        </div>
       </div>
       <div class="c">
         <div class="lbl">Tổng đơn hàng</div>
         <div class="val" id="k-ord">—</div>
-        <div class="sub"><span class="pill pw" id="k-apd">—</span></div>
-        <div style="display:flex;gap:6px;margin-top:7px">
-          <div class="mini-stat" style="flex:1">
-            <div class="ms-lbl">Ngày cao nhất</div>
+        <div class="sub"><span class="fn" id="k-apd">—</span></div>
+        <div style="display:flex;gap:5px;margin-top:7px">
+          <div class="mini-stat">
+            <div class="ms-lbl">Peak day</div>
             <div class="ms-val" id="k-pk">—</div>
             <div style="font-size:8px;color:var(--mu)" id="k-pkd">—</div>
           </div>
-          <div class="mini-stat" style="flex:1">
-            <div class="ms-lbl">TB/ngày</div>
-            <div class="ms-val" id="k-avg">—</div>
-            <div style="font-size:8px;color:var(--mu)">ngày có đơn</div>
+          <div class="mini-stat">
+            <div class="ms-lbl">Units/Order</div>
+            <div class="ms-val" id="k-upo">—</div>
+            <div style="font-size:8px;color:var(--mu)">avg basket</div>
           </div>
         </div>
       </div>
       <div class="c">
-        <div class="lbl">AOV trung bình</div>
+        <div class="lbl">AOV</div>
         <div class="val" id="k-aov">—</div>
-        <div class="sub"><span class="pill pg" id="k-aov-pill">—</span></div>
+        <div class="sub"><span class="pill" id="k-aov-pill">—</span></div>
         <div class="krow" id="k-aov-det"></div>
       </div>
       <div class="c">
-        <div class="lbl" id="k4-lbl">Dự báo EOM</div>
-        <div class="val" id="k4-val">—</div>
-        <div class="sub" id="k4-sub"></div>
-        <div class="krow" id="k4-det"></div>
+        <div class="lbl">Traffic / Leads</div>
+        <div class="val" id="k-traffic">—</div>
+        <div class="sub"><span class="fn" id="k-cr-lbl">—</span></div>
+        <div class="krow">
+          <div class="kline"><span style="color:var(--mu)">CR%</span><span class="kv" id="k-cr">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">CIR%</span><span class="kv" id="k-cir">—</span></div>
+        </div>
+      </div>
+      <div class="c">
+        <div class="lbl" id="k5-lbl">Dự báo EOM</div>
+        <div class="val" id="k5-val">—</div>
+        <div class="sub" id="k5-sub"></div>
+        <div class="krow" id="k5-det"></div>
       </div>
     </div>
 
+    <!-- ROW 2: Channel Donut + Daily Trend + Insight summary -->
     <div class="row r211">
       <div class="c">
         <div class="sl">% Đóng góp kênh</div>
         <div style="position:relative;height:130px;display:flex;align-items:center;justify-content:center">
-          <canvas id="dc" role="img" aria-label="Donut kênh GMV">Shopee, Facebook, TikTok, Event</canvas>
+          <canvas id="dc" aria-label="Donut kênh GMV">Shopee, Facebook, TikTok, Event, Website</canvas>
         </div>
         <div id="donut-leg" style="margin-top:6px"></div>
-        <div style="font-size:8px;color:var(--mu);margin-top:4px;padding:3px 6px;background:var(--bg);border-radius:4px">Website: chưa có dữ liệu</div>
       </div>
       <div class="c">
-        <div class="sl">Daily GMV vs Target <span id="cr" style="font-weight:400;color:var(--mu)"></span></div>
+        <div class="sl">Daily GMV vs Target <span id="cr-range" style="font-weight:400;color:var(--mu)"></span></div>
         <div style="position:relative;height:210px">
-          <canvas id="lc" role="img" aria-label="Daily GMV vs target">GMV từng ngày so target.</canvas>
+          <canvas id="lc" aria-label="Daily GMV vs target">GMV từng ngày so target.</canvas>
         </div>
       </div>
       <div class="c">
-        <div class="sl">Nhận định</div>
-        <div id="insights-panel"><div style="font-size:10px;color:var(--mu)">Đang phân tích...</div></div>
+        <div class="sl">Business Health</div>
+        <!-- New vs Returning -->
+        <div class="krow" style="margin-bottom:8px">
+          <div class="kline"><span style="color:var(--mu);font-size:9px;font-weight:700">New Customer GMV</span><span class="kv" id="h-new-gmv">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Contribution</span><span id="h-new-pct" class="kv">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Returning GMV</span><span class="kv" id="h-ret-gmv">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Contribution</span><span id="h-ret-pct" class="kv">—</span></div>
+        </div>
+        <div style="height:1px;background:var(--bl);margin-bottom:8px"></div>
+        <div class="krow">
+          <div class="kline"><span style="color:var(--mu);font-size:9px;font-weight:700">Top 5 SKU Contrib.</span><span class="kv" id="h-top5">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Total Units Sold</span><span class="kv" id="h-units">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Cancel Rate (Shopee)</span><span id="h-cancel" class="kv">—</span></div>
+          <div class="kline"><span style="color:var(--mu)">Return Rate (Shopee)</span><span id="h-return" class="kv">—</span></div>
+        </div>
       </div>
     </div>
 
+    <!-- ROW 3: Orders bar + Alerts -->
     <div class="row r31">
       <div class="c">
         <div class="sl">Đơn hàng theo ngày</div>
         <div style="position:relative;height:130px">
-          <canvas id="bc" role="img" aria-label="Đơn hàng theo ngày">Số đơn từng ngày.</canvas>
+          <canvas id="bc" aria-label="Orders by day">Đơn hàng từng ngày.</canvas>
         </div>
       </div>
       <div class="c">
-        <div class="sl">Tỉ lệ hủy & hoàn (Shopee)</div>
-        <div id="cancel-panel"><div style="font-size:10px;color:var(--mu)">Chọn tháng để xem...</div></div>
+        <div class="sl">Cảnh báo</div>
+        <div id="alerts-panel"></div>
+      </div>
+    </div>
+
+  </div><!-- end overview -->
+
+  <!-- ══════════════════════════════
+       TAB: CHANNEL PERFORMANCE
+  ══════════════════════════════ -->
+  <div class="panel" id="tab-channel">
+    <div id="channel-cards-grid" class="row r3"></div>
+    <div class="row r2" style="margin-top:8px">
+      <div class="c">
+        <div class="sl">Channel GMV — Stacked / Bar</div>
+        <div style="position:relative;height:220px">
+          <canvas id="ch-stacked" aria-label="Channel stacked bar">Channel daily GMV</canvas>
+        </div>
+      </div>
+      <div class="c">
+        <div class="sl">SOG — Source of Growth (Shopee)</div>
+        <div style="position:relative;height:220px">
+          <canvas id="sog-donut" aria-label="Source of growth donut">Organic, Paid, Live</canvas>
+        </div>
+        <div id="sog-leg" style="margin-top:6px"></div>
       </div>
     </div>
   </div>
 
-  <!-- SKU -->
+  <!-- ══════════════════════════════
+       TAB: SKU PERFORMANCE
+  ══════════════════════════════ -->
   <div class="panel" id="tab-sku">
+    <div class="row r4" style="margin-bottom:8px">
+      <div class="c">
+        <div class="lbl">Total Units Sold</div>
+        <div class="val" id="sku-units">—</div>
+        <div class="sub"><span class="fn">tháng này</span></div>
+      </div>
+      <div class="c">
+        <div class="lbl">Units / Order</div>
+        <div class="val" id="sku-upo">—</div>
+        <div class="sub"><span class="fn">avg basket size</span></div>
+      </div>
+      <div class="c">
+        <div class="lbl">Top 5 SKU Contribution</div>
+        <div class="val" id="sku-top5">—</div>
+        <div class="sub"><span class="fn">% tổng GMV</span></div>
+      </div>
+      <div class="c">
+        <div class="lbl">Active SKUs</div>
+        <div class="val" id="sku-count">—</div>
+        <div class="sub"><span class="fn">có doanh thu</span></div>
+      </div>
+    </div>
+
     <div class="row r22">
       <div class="c">
         <div class="sl">Top SKU — GMV & % Đóng góp</div>
-        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <div style="display:flex;gap:5px;margin-bottom:8px;align-items:center">
           <span style="font-size:9px;color:var(--mu)">Kênh:</span>
-          <select id="sku-ch" onchange="renderSku()">
+          <select id="sku-ch" onchange="renderSkuList()">
             <option value="all">Tất cả</option>
             <option value="Shopee">Shopee</option>
             <option value="Facebook">Facebook</option>
             <option value="Tiktok">TikTok</option>
             <option value="Event">Event</option>
+            <option value="Website">Website</option>
           </select>
         </div>
         <div id="sku-list"></div>
       </div>
       <div class="c">
+        <div class="sl">Top 5 SKU Combo Chart (Bar = Units, Line = GMV%)</div>
+        <div style="position:relative;height:200px">
+          <canvas id="sku-combo" aria-label="SKU combo chart">Top 5 SKU bar + line</canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="row r22" style="margin-top:8px">
+      <div class="c">
         <div class="sl">% Đóng góp theo Màu sắc</div>
-        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <div style="margin-bottom:7px;display:flex;gap:5px;align-items:center">
           <span style="font-size:9px;color:var(--mu)">SP:</span>
-          <select id="sel-c" onchange="renderColor()" style="flex:1;max-width:210px"></select>
+          <select id="sel-c" onchange="renderColor()" style="flex:1;max-width:220px"></select>
         </div>
         <div id="color-list"></div>
       </div>
-    </div>
-    <div class="row r22">
       <div class="c">
         <div class="sl">% Đóng góp theo Size</div>
-        <div style="display:flex;gap:4px;margin-bottom:8px;align-items:center">
+        <div style="margin-bottom:7px;display:flex;gap:5px;align-items:center">
           <span style="font-size:9px;color:var(--mu)">SP:</span>
-          <select id="sel-s" onchange="renderSize()" style="flex:1;max-width:210px"></select>
+          <select id="sel-s" onchange="renderSize()" style="flex:1;max-width:220px"></select>
         </div>
         <div id="size-list"></div>
       </div>
+    </div>
+
+    <div class="row r22" style="margin-top:8px">
+      <div class="c">
+        <div class="sl">Daily SKU Units Sold Trend</div>
+        <div style="position:relative;height:160px">
+          <canvas id="sku-daily" aria-label="Daily units trend">Units sold daily</canvas>
+        </div>
+      </div>
       <div class="c">
         <div class="sl">Gender Split</div>
-        <div style="display:flex;gap:16px;align-items:center">
+        <div style="display:flex;gap:14px;align-items:center">
           <div style="position:relative;width:110px;height:110px;flex-shrink:0">
-            <canvas id="gc" role="img" aria-label="Gender donut">Bé gái, Bé trai, Unisex</canvas>
+            <canvas id="gc" aria-label="Gender donut">Bé gái, Bé trai, Unisex</canvas>
           </div>
           <div id="gender-leg"></div>
         </div>
-        <div class="sl" style="margin-top:12px">% Đóng góp kênh (tháng hiện tại)</div>
+        <div class="sl" style="margin-top:10px">Channel Contribution (Actual)</div>
         <div style="position:relative;height:100px">
-          <canvas id="chb" role="img" aria-label="Channel bar">Shopee, Facebook, TikTok, Event</canvas>
+          <canvas id="chb" aria-label="Channel horizontal bar">Shopee, Facebook, TikTok, Event, Website</canvas>
         </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- ══════════════════════════════
+       TAB: NHẬN ĐỊNH
+  ══════════════════════════════ -->
+  <div class="panel" id="tab-insight">
+    <div class="row r3">
+      <div class="c">
+        <div class="sec-hdr" style="color:var(--su)">🟢 TÍCH CỰC</div>
+        <div id="ins-pos"></div>
+      </div>
+      <div class="c">
+        <div class="sec-hdr" style="color:var(--da)">🔴 RỦI RO</div>
+        <div id="ins-risk"></div>
+      </div>
+      <div class="c">
+        <div class="sec-hdr" style="color:var(--br)">⚫ HÀNH ĐỘNG</div>
+        <div id="ins-act"></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .wrap -->
 
 <script>
-/* ── CONFIG ── */
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwKFqZ8ZLrqMYXKX2Fg_xk_gdTnHX9oDVHe7S5-e1qMO4NkN4-Az8j8H0ekV-Jtc5pP3A/exec';
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxXmCeO0-toOtl6o9m4B3yZZIWgcAxSfTo58onEHIbgNaCiqbbxytdsOIx9jjK3F8S6Ag/exec';
 
-/* ── STATE ── */
+/* ══════════════════════════════════════════
+   STATE
+══════════════════════════════════════════ */
 let D = {};
-let CH_DAYS = {};
+let CH = {};     // processed channel day arrays
 let SKU = [];
-let fromDate = '', toDate = '', activeCh = 'all';
-let lineChart, donutChart, barChart, chBarChart, genderChart;
+let SKU_DAILY = {};
+let fromDate = '', toDate = '';
+let activeCh = 'all';
+let CHARTS = {};
 let skuInit = false;
 
-const fmt = v => !v&&v!==0?'₫0':Math.abs(v)>=1e9?'₫'+(v/1e9).toFixed(1)+'B':Math.abs(v)>=1e6?'₫'+(v/1e6).toFixed(1)+'M':Math.abs(v)>=1e3?'₫'+(v/1e3).toFixed(0)+'K':'₫'+Math.round(v);
-const pct = (v,t) => t>0?(v/t*100).toFixed(1)+'%':'0%';
-const CP = ['#D99A7A','#6B4F3F','#F3C6B8','#8B7355','#9C7C6E','#EAD8C0','#C8A882','#B8927A'];
-const CH_COLORS = {Shopee:'#D99A7A', Facebook:'#6B4F3F', Tiktok:'#F3C6B8', Event:'#8B7355'};
-const MONTHS_VI = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+/* ══════════════════════════════════════════
+   HELPERS
+══════════════════════════════════════════ */
+const fmt = v => {
+  if (!v && v !== 0) return 'No Data';
+  const a = Math.abs(v);
+  if (a >= 1e9) return '₫' + (v/1e9).toFixed(1) + 'B';
+  if (a >= 1e6) return '₫' + (v/1e6).toFixed(1) + 'M';
+  if (a >= 1e3) return '₫' + (v/1e3).toFixed(0) + 'K';
+  return '₫' + Math.round(v);
+};
+const fmtN = v => v == null ? 'No Data' : Number(v).toLocaleString('vi-VN');
+const pct  = (v, t) => t > 0 ? (v/t*100).toFixed(1) + '%' : '0%';
+const pctN = (v, t) => t > 0 ? (v/t*100).toFixed(1) : '0';
 
-/* ── LOAD DATA ── */
+const CH_COLORS = {
+  Shopee:'#D99A7A', Facebook:'#6B4F3F', Tiktok:'#C8A882',
+  Event:'#8B7355', Website:'#A8C4D4'
+};
+const MONTHS_VI = ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6',
+                   'Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12'];
+const CP = ['#D99A7A','#6B4F3F','#F3C6B8','#8B7355','#9C7C6E','#EAD8C0','#C8A882','#A8C4D4','#B8927A'];
+
+function safe0(v){ return (v == null || isNaN(v)) ? 0 : v; }
+function pillClass(pctVal){ return pctVal >= 80 ? 'pg' : pctVal >= 50 ? 'pw' : 'pr'; }
+
+/* ══════════════════════════════════════════
+   LOAD DATA
+══════════════════════════════════════════ */
 async function loadData() {
-  document.getElementById('ls').style.display = 'flex';
-  document.getElementById('mw').style.display = 'none';
+  const ls = document.getElementById('ls');
+  const mw = document.getElementById('mw');
+  ls.classList.remove('hidden');
+  ls.style.display = 'flex';
+  mw.style.display = 'none';
   setMsg('Đang kết nối Google Sheets...');
 
   if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
     showErr('Chưa cấu hình Apps Script URL',
-      'Mở file HTML → tìm APPS_SCRIPT_URL → dán URL của bạn vào.');
+      'Mở file HTML → tìm APPS_SCRIPT_URL → dán URL của bạn vào.<br>Sau đó reload trang.');
     return;
   }
   try {
-    setMsg('Đang tải dữ liệu từ Google Sheets...');
+    setMsg('Đang tải dữ liệu...');
     const res = await fetch(APPS_SCRIPT_URL);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     D = await res.json();
     if (D.error) throw new Error(D.error);
-    setMsg('Đang xử lý và render...');
+
+    setMsg('Đang xử lý...');
     processData();
-    initDashboard();
+    buildMonthSelector();
+    initAllCharts();
+    applyFilters();
+
     document.getElementById('lupd').textContent = new Date().toLocaleTimeString('vi-VN');
-    document.getElementById('ls').style.display = 'none';
-    document.getElementById('mw').style.display = 'block';
+    ls.classList.add('hidden');
+    setTimeout(() => { ls.style.display = 'none'; }, 400);
+    mw.style.display = 'block';
   } catch(err) {
-    showErr('Lỗi kết nối', err.message+'<br><br>Kiểm tra: (1) URL đúng (2) Deploy đúng cách (3) Who has access = Anyone');
+    showErr('Lỗi kết nối', err.message +
+      '<br><br>Kiểm tra: (1) URL đúng chưa (2) Deploy với "Anyone" (3) Sheet tồn tại');
   }
 }
-function setMsg(m){document.getElementById('lmsg').textContent=m;}
-function showErr(t,b){document.getElementById('ls').innerHTML=`<div class="err-box"><h3>${t}</h3><p>${b}</p></div>`;}
+function setMsg(m){ document.getElementById('lmsg').textContent = m; }
+function showErr(t,b){ document.getElementById('ls').innerHTML =
+  `<div class="err-box"><h3>${t}</h3><p>${b}</p></div>`; }
 
-/* ── PROCESS DATA ── */
+/* ══════════════════════════════════════════
+   PROCESS DATA
+══════════════════════════════════════════ */
 function processData() {
-  SKU = D.sku || [];
-  const fbMap={}, spMap={}, ttMap={}, evMap={};
-  (D.facebook||[]).forEach(r=>fbMap[r.date]=r);
-  (D.shopee||[]).forEach(r=>spMap[r.date]=r);
-  (D.tiktok||[]).forEach(r=>ttMap[r.date]=r);
-  (D.event||[]).forEach(r=>evMap[r.date]=r);
-
-  CH_DAYS = {
-    all: (D.daily||[]).map(r=>({d:r.date, lb:lbl(r.date), gmv:r.gmv, tgt:r.target, ord:r.orders})),
-    Shopee: Object.values(spMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,cancelOrder:r.cancelOrder,cancelGmv:r.cancelGmv,returnOrder:r.returnOrder,returnGmv:r.returnGmv,newCust:r.newCust,shopTab:r.shopTab})).sort((a,b)=>a.d>b.d?1:-1),
-    Facebook: Object.values(fbMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,ads:r.ads,cir:r.cir,leads:r.leads})).sort((a,b)=>a.d>b.d?1:-1),
-    Tiktok: Object.values(ttMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,shopTab:r.shopTab,video:r.video,live:r.live})).sort((a,b)=>a.d>b.d?1:-1),
-    Event: Object.values(evMap).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders})).sort((a,b)=>a.d>b.d?1:-1),
+  const buildMap = (arr) => {
+    const m = {};
+    (arr||[]).forEach(r => { m[r.date] = r; });
+    return m;
   };
+  CH = {
+    all:     { days: (D.daily||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders})), synced: (D.daily||[]).length>0 },
+    Shopee:  { days: (D.shopee||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,newCust:r.newCust,oldCust:r.oldCust,shopTab:r.shopTab,cancelGmv:r.cancelGmv,cancelOrder:r.cancelOrder,returnGmv:r.returnGmv,returnOrder:r.returnOrder})), synced: (D.shopee||[]).some(r=>r.gmv>0) },
+    Facebook:{ days: (D.facebook||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,leads:r.leads,ads:r.ads,cir:r.cir})), synced: (D.facebook||[]).some(r=>r.gmv>0) },
+    Tiktok:  { days: (D.tiktok||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,aov:r.aov,cr:r.cr,visitor:r.visitor,shopTab:r.shopTab,video:r.video,live:r.live})), synced: (D.tiktok||[]).some(r=>r.gmv>0) },
+    Event:   { days: (D.event||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders})), synced: (D.event||[]).some(r=>r.gmv>0) },
+    Website: { days: (D.website||[]).map(r=>({d:r.date,lb:lbl(r.date),gmv:r.gmv,tgt:r.target,ord:r.orders,visitor:r.visitor,cr:r.cr,aov:r.aov,ads:r.ads,cir:r.cir})), synced: (D.website||[]).some(r=>r.gmv>0) },
+  };
+  // Sort all by date
+  Object.keys(CH).forEach(k => CH[k].days.sort((a,b)=>a.d>b.d?1:-1));
+
+  const skuRaw = D.sku || {};
+  SKU = (skuRaw.items || []);
+  SKU_DAILY = skuRaw.dailyUnits || {};
 }
 
-function lbl(d){if(!d)return'';const p=d.split('-');return parseInt(p[2])+'/'+parseInt(p[1]);}
+function lbl(d){ if(!d) return ''; const p=d.split('-'); return parseInt(p[2])+'/'+parseInt(p[1]); }
 
-/* ── MONTH SELECTOR ── */
-function buildMonthSelector() {
-  const dates = [...new Set((D.daily||[]).map(r=>r.date.slice(0,7)))].sort();
+/* ══════════════════════════════════════════
+   MONTH SELECTOR
+══════════════════════════════════════════ */
+function buildMonthSelector(){
+  const allDates = (D.daily||[]).map(r=>r.date.slice(0,7));
+  const months = [...new Set(allDates)].sort();
   const sel = document.getElementById('f-month');
   const now = new Date();
   const curYM = now.getFullYear()+'-'+(now.getMonth()+1).toString().padStart(2,'0');
   sel.innerHTML = '';
-  // Only months that have data
-  dates.forEach(ym => {
-    const [y,m] = ym.split('-');
+  if (!months.length) {
     const opt = document.createElement('option');
-    opt.value = ym;
-    opt.textContent = MONTHS_VI[parseInt(m)-1] + ' ' + y;
-    if (ym === curYM || ym === dates[dates.length-1]) opt.selected = true;
-    sel.appendChild(opt);
-  });
+    opt.value = curYM; opt.textContent = 'Dữ liệu hiện tại'; sel.appendChild(opt);
+  } else {
+    months.forEach(ym => {
+      const [y,m] = ym.split('-');
+      const opt = document.createElement('option');
+      opt.value = ym;
+      opt.textContent = MONTHS_VI[parseInt(m)-1] + ' ' + y;
+      if (ym === curYM || ym === months[months.length-1]) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  }
   setDateRangeFromMonth(sel.value);
 }
-
-function setDateRangeFromMonth(ym) {
+function setDateRangeFromMonth(ym){
   const [y,m] = ym.split('-').map(Number);
   const firstDay = y+'-'+String(m).padStart(2,'0')+'-01';
-  const lastDay = new Date(y,m,0); // last day of month
-  const toD = y+'-'+String(m).padStart(2,'0')+'-'+String(lastDay.getDate()).padStart(2,'0');
-  fromDate = firstDay;
-  toDate = toD;
+  const last = new Date(y,m,0).getDate();
+  const lastDay = y+'-'+String(m).padStart(2,'0')+'-'+String(last).padStart(2,'0');
+  fromDate = firstDay; toDate = lastDay;
   document.getElementById('df').value = fromDate;
   document.getElementById('dt').value = toDate;
 }
+function onMonthChange(){ setDateRangeFromMonth(document.getElementById('f-month').value); applyFilters(); }
+function clearMonthPreset(){ /* user picked custom date */ }
 
-function onMonthChange() {
-  setDateRangeFromMonth(document.getElementById('f-month').value);
-  applyFilters();
+/* ══════════════════════════════════════════
+   FILTER LOGIC
+══════════════════════════════════════════ */
+function getRows(){
+  const days = (CH[activeCh]||CH.all).days;
+  return days.filter(r => r.d >= fromDate && r.d <= toDate);
+}
+function filterCh(chKey){
+  return (CH[chKey]||{days:[]}).days.filter(r=>r.d>=fromDate&&r.d<=toDate);
 }
 
-function onDateChange() {
-  // When user picks custom date, clear month selector visual but keep it
-  const fi = document.getElementById('df').value;
-  const ti = document.getElementById('dt').value;
-  if (fi) fromDate = fi;
-  if (ti) toDate = ti;
-}
-
-function applyFilters() {
-  const fi=document.getElementById('df').value, ti=document.getElementById('dt').value;
-  if(fi) fromDate=fi; if(ti) toDate=ti;
-  const cn=activeCh==='all'?'Tất cả kênh':activeCh==='Tiktok'?'TikTok':activeCh;
-  const fd=fromDate.slice(8)+'/'+fromDate.slice(5,7), td=toDate.slice(8)+'/'+toDate.slice(5,7);
-  document.getElementById('fn').textContent=fd+' → '+td+' · '+cn;
-  document.getElementById('cr').textContent='('+fd+' – '+td+')';
-  // Update header period
-  const selM = document.getElementById('f-month');
-  document.getElementById('hm-period').textContent = selM.options[selM.selectedIndex]?.textContent || fd+' – '+td;
-  updateOverview();
-}
-
-function setCh(ch,btn){
-  activeCh=ch;
-  document.querySelectorAll('.cp').forEach(b=>b.classList.remove('act'));
+function setCh(ch, btn){
+  activeCh = ch;
+  document.querySelectorAll('.ch-pill').forEach(b=>b.classList.remove('act'));
   btn.classList.add('act');
   applyFilters();
 }
-
-/* ── GET ROWS ── */
-function getRows(){return(CH_DAYS[activeCh]||[]).filter(r=>r.d>=fromDate&&r.d<=toDate);}
-
-/* ── FORECAST LOGIC ──
-   Chỉ tính trên ngày có data thực (gmv > 0) trong khoảng filter
-   Forecast = avg_per_day × tổng_ngày_của_tháng_filter
-   Không dùng totalActual từ monthly sheet (vì có Event)
-*/
-function calcForecast(rows) {
-  const now = new Date();
-  // Ngày trong tháng của fromDate
-  const [fy,fm] = fromDate.split('-').map(Number);
-  const daysInMonth = new Date(fy, fm, 0).getDate();
-  const activeDays = rows.filter(r=>r.gmv>0).length || 1;
-  const totalGMV = rows.reduce((s,r)=>s+r.gmv,0);
-  const avgPerDay = totalGMV / activeDays;
-  const forecast = Math.round(avgPerDay * daysInMonth);
-  return { forecast, activeDays, daysInMonth, avgPerDay };
+function applyFilters(){
+  const fi=document.getElementById('df').value, ti=document.getElementById('dt').value;
+  if(fi) fromDate=fi; if(ti) toDate=ti;
+  const chName = activeCh==='all'?'Tất cả kênh':activeCh==='Tiktok'?'TikTok':activeCh;
+  const fd=fromDate.slice(8)+'/'+fromDate.slice(5,7), td=toDate.slice(8)+'/'+toDate.slice(5,7);
+  document.getElementById('fn').textContent = fd+' → '+td+' · '+chName;
+  document.getElementById('cr-range').textContent = '('+fd+' – '+td+')';
+  const selM = document.getElementById('f-month');
+  document.getElementById('hm-period').textContent = selM.options[selM.selectedIndex]?.textContent || (fd+' – '+td);
+  updateOverview();
+  updateChannelTab();
+  updateInsights();
 }
 
-/* ── UPDATE OVERVIEW ── */
-function updateOverview() {
-  const rows=getRows();
-  const gmvs=rows.map(r=>r.gmv), tgts=rows.map(r=>r.tgt), ords=rows.map(r=>r.ord||0);
-  const labels=rows.map(r=>r.lb);
-  const tGMV=gmvs.reduce((a,b)=>a+b,0);
-  const tTgt=tgts.reduce((a,b)=>a+b,0);
-  const tOrd=ords.reduce((a,b)=>a+b,0);
-  const p=tTgt>0?tGMV/tTgt*100:0;
-  const active=gmvs.filter(v=>v>0).length||1;
-  const peakOrd=Math.max(...ords,0);
-  const peakIdx=ords.indexOf(peakOrd);
-  const tAOV=tOrd>0?Math.round(tGMV/tOrd):0;
+/* ══════════════════════════════════════════
+   OVERVIEW UPDATE
+══════════════════════════════════════════ */
+function updateOverview(){
+  const rows = getRows();
+  const gmvs = rows.map(r=>safe0(r.gmv));
+  const tgts  = rows.map(r=>safe0(r.tgt));
+  const ords  = rows.map(r=>safe0(r.ord||0));
+  const labels= rows.map(r=>r.lb);
 
-  document.getElementById('k-gmv').textContent=fmt(tGMV);
-  document.getElementById('k-pct').textContent=p.toFixed(1)+'% đạt';
-  const pctEl=document.getElementById('k-pct');
-  pctEl.className='pill '+(p>=80?'pg':p>=50?'pw':'pr');
-  document.getElementById('k-bar').style.width=Math.min(p,100)+'%';
-  document.getElementById('k-tgt').textContent=fmt(tTgt);
-  document.getElementById('k-ord').textContent=tOrd;
-  document.getElementById('k-pk').textContent=peakOrd;
-  document.getElementById('k-pkd').textContent=rows[peakIdx]?.lb||'—';
-  document.getElementById('k-avg').textContent=(tOrd/active).toFixed(1);
-  document.getElementById('k-apd').textContent='~'+(tOrd/active).toFixed(1)+'/ngày';
-  document.getElementById('k-aov').textContent=fmt(tAOV);
+  const tGMV = gmvs.reduce((a,b)=>a+b,0);
+  const tTgt  = tgts.reduce((a,b)=>a+b,0);
+  const tOrd  = ords.reduce((a,b)=>a+b,0);
+  const p = tTgt>0?tGMV/tTgt*100:0;
+  const active = gmvs.filter(v=>v>0).length||1;
+  const peakOrd = Math.max(...ords,0);
+  const peakIdx = ords.indexOf(peakOrd);
+  const tAOV = tOrd>0?Math.round(tGMV/tOrd):0;
 
-  // AOV detail
-  const pill=document.getElementById('k-aov-pill');
+  // Total units from SKU daily
+  const totalUnits = Object.entries(SKU_DAILY)
+    .filter(([d])=>d>=fromDate&&d<=toDate)
+    .reduce((s,[,v])=>s+v,0);
+  const upo = tOrd>0?(totalUnits/tOrd).toFixed(1):'—';
+
+  // GMV KPI
+  setText('k-gmv', fmt(tGMV));
+  const achEl = document.getElementById('k-ach-pill');
+  achEl.textContent = p.toFixed(1)+'% đạt'; achEl.className='pill '+pillClass(p);
+  setText('k-ach-lbl', 'achievement');
+  document.getElementById('k-bar').style.width = Math.min(p,100)+'%';
+  setText('k-tgt', fmt(tTgt));
+
+  // Orders
+  setText('k-ord', fmtN(tOrd));
+  setText('k-apd', '~'+(tOrd/active).toFixed(1)+' đơn/ngày');
+  setText('k-pk', peakOrd);
+  setText('k-pkd', rows[peakIdx]?.lb||'—');
+  setText('k-upo', upo);
+
+  // AOV
+  setText('k-aov', fmt(tAOV));
+  const aovPill = document.getElementById('k-aov-pill');
+  aovPill.textContent = activeCh==='all'?'Tất cả kênh':activeCh==='Tiktok'?'TikTok':activeCh;
+  aovPill.className = 'pill pg';
   if(activeCh==='all'){
-    pill.textContent='Tất cả kênh';pill.className='pill pg';
-    const spAOV=calcAOV(filterByDate(D.shopee));
-    const fbAOV=calcAOV(filterByDate(D.facebook));
-    const ttAOV=calcAOV(filterByDate(D.tiktok));
-    document.getElementById('k-aov-det').innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">Facebook</span><span style="font-weight:700;color:var(--br)">${fmt(fbAOV)}</span></div>
-      <div class="kline"><span style="color:var(--mu)">Shopee</span><span style="font-weight:700;color:var(--br)">${fmt(spAOV)}</span></div>
-      <div class="kline"><span style="color:var(--mu)">TikTok</span><span style="font-weight:700;color:var(--br)">${fmt(ttAOV)}</span></div>`;
+    const aovLines = ['Shopee','Facebook','Tiktok'].map(ch=>{
+      const r2=filterCh(ch); const g=r2.reduce((s,r)=>s+r.gmv,0); const o=r2.reduce((s,r)=>s+(r.ord||0),0);
+      return `<div class="kline"><span style="color:var(--mu)">${ch==='Tiktok'?'TikTok':ch}</span><span class="kv">${o>0?fmt(Math.round(g/o)):'—'}</span></div>`;
+    }).join('');
+    document.getElementById('k-aov-det').innerHTML = aovLines;
   } else {
-    pill.textContent=activeCh==='Tiktok'?'TikTok':activeCh;pill.className='pill pw';
-    const aovs=rows.filter(r=>r.aov>0).map(r=>r.aov);
-    document.getElementById('k-aov-det').innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">Cao nhất</span><span style="font-weight:700;color:var(--br)">${fmt(aovs.length?Math.max(...aovs):0)}</span></div>
-      <div class="kline"><span style="color:var(--mu)">Thấp nhất</span><span style="font-weight:700;color:var(--br)">${fmt(aovs.length?Math.min(...aovs):0)}</span></div>`;
+    const aovs = rows.filter(r=>r.aov>0).map(r=>r.aov);
+    document.getElementById('k-aov-det').innerHTML = aovs.length ?
+      `<div class="kline"><span style="color:var(--mu)">Cao nhất</span><span class="kv">${fmt(Math.max(...aovs))}</span></div>
+       <div class="kline"><span style="color:var(--mu)">Thấp nhất</span><span class="kv">${fmt(Math.min(...aovs))}</span></div>` : '<div style="font-size:10px;color:var(--mu)">No Data</div>';
   }
 
-  // 4th card
-  renderK4(rows, tGMV, p, tOrd);
+  // Traffic / CR / CIR
+  const spRows = filterCh('Shopee'), fbRows = filterCh('Facebook'), ttRows = filterCh('Tiktok'), wbRows = filterCh('Website');
+  const totalVisitor = [...spRows,...ttRows,...wbRows].reduce((s,r)=>s+(r.visitor||0),0);
+  const totalLeads   = fbRows.reduce((s,r)=>s+(r.leads||0),0);
+  const totalTraffic = totalVisitor + totalLeads;
+  const totalAds     = [...fbRows,...wbRows,...ttRows].reduce((s,r)=>s+(r.ads||0),0);
+  const crVal  = totalTraffic>0?(tOrd/totalTraffic*100).toFixed(2)+'%':'—';
+  const cirVal = tGMV>0&&totalAds>0?(totalAds/tGMV*100).toFixed(1)+'%':'—';
+  setText('k-traffic', fmtN(totalTraffic));
+  setText('k-cr-lbl', totalVisitor>0?'Visitors':'Leads');
+  setText('k-cr', crVal);
+  setText('k-cir', cirVal);
+
+  // Forecast EOM
+  renderK5(rows, tGMV, p, tTgt);
+
+  // Business health — new vs returning
+  const totalNewCust   = spRows.reduce((s,r)=>s+(r.newCust||0),0);
+  const totalOldCust   = spRows.reduce((s,r)=>s+(r.oldCust||0),0);
+  const spGMV = spRows.reduce((s,r)=>s+r.gmv,0);
+  const spOrds = spRows.reduce((s,r)=>s+(r.ord||0),0);
+  const newGMV = spOrds>0?Math.round(spGMV*(totalNewCust/(totalNewCust+totalOldCust||1))):0;
+  const retGMV = spGMV - newGMV;
+  setText('h-new-gmv', fmt(newGMV));
+  setText('h-new-pct', pct(newGMV,spGMV));
+  setText('h-ret-gmv', fmt(retGMV));
+  setText('h-ret-pct', pct(retGMV,spGMV));
+
+  // Top 5 contribution
+  const top5GMV = SKU.slice(0,5).reduce((s,r)=>s+r.gmv_all,0);
+  const allSkuGMV = SKU.reduce((s,r)=>s+r.gmv_all,0);
+  setText('h-top5', pct(top5GMV,allSkuGMV));
+  setText('h-units', fmtN(totalUnits));
+
+  // Cancel / return
+  const cancelGMV = spRows.reduce((s,r)=>s+(r.cancelGmv||0),0);
+  const returnGMV = spRows.reduce((s,r)=>s+(r.returnGmv||0),0);
+  const spG = spRows.reduce((s,r)=>s+r.gmv,0)||1;
+  const cancelEl = document.getElementById('h-cancel');
+  const retEl = document.getElementById('h-return');
+  cancelEl.textContent = (cancelGMV/spG*100).toFixed(1)+'%';
+  cancelEl.className = 'kv '+(cancelGMV/spG>0.1?'pr':'pw');
+  retEl.textContent = (returnGMV/spG*100).toFixed(1)+'%';
+  retEl.className = 'kv '+(returnGMV/spG>0.05?'pr':'pg');
+
+  // Alerts
+  renderAlerts(p, tGMV, tTgt, cirVal, crVal, totalTraffic, tOrd);
 
   // Charts
-  if(lineChart){lineChart.data.labels=labels;lineChart.data.datasets[0].data=gmvs;lineChart.data.datasets[1].data=tgts;lineChart.update();}
-  if(barChart){barChart.data.labels=labels;barChart.data.datasets[0].data=ords;barChart.data.datasets[0].backgroundColor=ords.map(v=>v>=30?'#6B4F3F':v>=20?'#D99A7A':'#EAD8C0');barChart.update();}
-
-  // Donut — always all channels
-  const spT=filterByDate(D.shopee).reduce((s,r)=>s+r.gmv,0);
-  const fbT=filterByDate(D.facebook).reduce((s,r)=>s+r.gmv,0);
-  const ttT=filterByDate(D.tiktok).reduce((s,r)=>s+r.gmv,0);
-  const evT=filterByDate(D.event).reduce((s,r)=>s+r.gmv,0);
-  const ct=spT+fbT+ttT+evT||1;
-  const chVals=[spT,fbT,ttT,evT];
-  const chNames=['Shopee','Facebook','TikTok','Event'];
-  const chColors=['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'];
-  if(donutChart){donutChart.data.datasets[0].data=chVals;donutChart.update();}
-  document.getElementById('donut-leg').innerHTML=chNames.map((n,i)=>
-    `<div class="leg"><div class="ld" style="background:${chColors[i]}"></div><span style="flex:1">${n}</span><b>${pct(chVals[i],ct)}</b></div>`
-  ).join('');
-
-  // Cancel/Return panel (Shopee only)
-  renderCancelPanel();
-
-  renderInsights(tGMV,p,spT,fbT,ttT,evT,ct);
+  updateCharts(labels, gmvs, tgts, ords, tGMV);
 }
 
-function filterByDate(arr) {
-  return (arr||[]).filter(r=>r.date>=fromDate&&r.date<=toDate);
-}
-
-function calcAOV(arr) {
-  const gmv=arr.reduce((s,r)=>s+r.gmv,0);
-  const ord=arr.reduce((s,r)=>s+r.orders,0);
-  return ord>0?Math.round(gmv/ord):0;
-}
-
-/* ── K4 CARD ── */
-function renderK4(rows, tGMV, p, tOrd) {
-  const lbl=document.getElementById('k4-lbl');
-  const val=document.getElementById('k4-val');
-  const sub=document.getElementById('k4-sub');
-  const det=document.getElementById('k4-det');
-
+function renderK5(rows, tGMV, p, tTgt){
+  const lbl5=document.getElementById('k5-lbl'), val5=document.getElementById('k5-val'),
+        sub5=document.getElementById('k5-sub'), det5=document.getElementById('k5-det');
   if(activeCh==='all'){
-    // Forecast EOM — dùng daily data trong tháng filter
-    lbl.textContent='Dự báo EOM';
-    const {forecast, activeDays, daysInMonth, avgPerDay} = calcForecast(rows);
-    const mTgt = (D.monthly?.totalTarget)||0;
-    const fp = mTgt>0?forecast/mTgt*100:0;
-    val.textContent=fmt(forecast);
-    val.style.color=fp>=80?'var(--br)':fp>=50?'var(--wa)':'var(--da)';
-    sub.innerHTML=`<span class="pill ${fp>=80?'pg':fp>=50?'pw':'pr'}">${fp.toFixed(1)}% target</span>`;
-    det.innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">Avg/ngày</span><span style="font-weight:700;color:var(--br)">${fmt(Math.round(avgPerDay))}</span></div>
-      <div class="kline"><span style="color:var(--mu)">Ngày có data</span><span style="font-weight:700;color:var(--br)">${activeDays}/${daysInMonth} ngày</span></div>
-      <div class="kline"><span style="color:var(--mu)">Gap vs target</span><span style="font-weight:700;color:var(--da)">${fmt(Math.max(0,mTgt-forecast))}</span></div>`;
-  } else if(activeCh==='Shopee'){
-    lbl.textContent='Shopee — Traffic';
-    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
-    const avgCR=(rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0)*100).toFixed(2);
-    const newC=rows.reduce((s,r)=>s+(r.newCust||0),0);
-    val.textContent=tVis.toLocaleString('vi-VN');val.style.color='var(--br)';
-    sub.innerHTML=`<span class="pill pg">Visitors</span>`;
-    det.innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${avgCR}%</span></div>
-      <div class="kline"><span style="color:var(--mu)">Khách mới</span><span style="font-weight:700;color:var(--br)">${newC.toLocaleString('vi-VN')}</span></div>`;
-  } else if(activeCh==='Facebook'){
-    lbl.textContent='Facebook — Ads';
-    const tAds=rows.reduce((s,r)=>s+(r.ads||0),0);
-    const gmv=rows.reduce((s,r)=>s+r.gmv,0);
-    const cir=gmv>0?tAds/gmv*100:0;
-    const roas=tAds>0?gmv/tAds:0;
-    const leads=rows.reduce((s,r)=>s+(r.leads||0),0);
-    val.textContent=fmt(tAds);val.style.color=cir>30?'var(--da)':'var(--wa)';
-    sub.innerHTML=`<span class="pill ${cir>30?'pr':'pw'}">CIR ${cir.toFixed(1)}%</span>`;
-    det.innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">ROAS</span><span style="font-weight:700;color:var(--br)">${roas.toFixed(2)}x</span></div>
-      <div class="kline"><span style="color:var(--mu)">Tổng leads</span><span style="font-weight:700;color:var(--br)">${leads.toLocaleString('vi-VN')}</span></div>
-      <div class="kline"><span style="color:var(--mu)">GMV/₫1 Ads</span><span style="font-weight:700;color:${roas>=3?'var(--su)':'var(--da)'}">₫${roas.toFixed(1)}</span></div>`;
-  } else if(activeCh==='Tiktok'){
-    lbl.textContent='TikTok — Traffic';
-    const tVis=rows.reduce((s,r)=>s+(r.visitor||0),0);
-    const avgCR=rows.filter(r=>r.cr>0).reduce((s,r,_,a)=>s+r.cr/a.length,0).toFixed(2);
-    const shopTab=rows.reduce((s,r)=>s+(r.shopTab||0),0);
-    val.textContent=tVis.toLocaleString('vi-VN');val.style.color='var(--br)';
-    sub.innerHTML=`<span class="pill pw">Visitors</span>`;
-    det.innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">CR trung bình</span><span style="font-weight:700;color:var(--br)">${avgCR}%</span></div>
-      <div class="kline"><span style="color:var(--mu)">Shop Tab</span><span style="font-weight:700;color:var(--br)">${fmt(shopTab)}</span></div>
-      <div class="kline"><span style="color:var(--mu)">Ngày active</span><span style="font-weight:700;color:var(--br)">${rows.length} ngày</span></div>`;
-  } else if(activeCh==='Event'){
-    lbl.textContent='Event';
-    const evTgt=D.monthly?.eventTarget||0;
-    const evAct=D.monthly?.eventActual||0;
-    const evPct=evTgt>0?evAct/evTgt*100:0;
-    val.textContent=fmt(evAct);val.style.color='var(--br)';
-    sub.innerHTML=`<span class="pill ${evPct>=80?'pg':'pw'}">${evPct.toFixed(1)}% target</span>`;
-    det.innerHTML=`
-      <div class="kline"><span style="color:var(--mu)">Target</span><span style="font-weight:700;color:var(--br)">${fmt(evTgt)}</span></div>
-      <div class="kline"><span style="color:var(--mu)">Gap</span><span style="font-weight:700;color:var(--da)">${fmt(Math.max(0,evTgt-evAct))}</span></div>`;
+    lbl5.textContent='Dự báo EOM';
+    const [fy,fm]=fromDate.split('-').map(Number);
+    const daysInMonth=new Date(fy,fm,0).getDate();
+    const activeDays=rows.filter(r=>r.gmv>0).length||1;
+    const avgPerDay=tGMV/activeDays;
+    const forecast=Math.round(avgPerDay*daysInMonth);
+    const mTgt=D.monthly?.totalTarget||tTgt||1;
+    const fp=mTgt>0?forecast/mTgt*100:0;
+    val5.textContent=fmt(forecast); val5.style.color=fp>=80?'var(--su)':fp>=50?'var(--wa)':'var(--da)';
+    sub5.innerHTML=`<span class="pill ${pillClass(fp)}">${fp.toFixed(1)}% target</span>`;
+    const runRate=daysInMonth-activeDays>0?Math.round((mTgt-tGMV)/(daysInMonth-activeDays)):0;
+    det5.innerHTML=`
+      <div class="kline"><span style="color:var(--mu)">Avg/ngày</span><span class="kv">${fmt(Math.round(avgPerDay))}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Ngày còn lại</span><span class="kv">${daysInMonth-activeDays}</span></div>
+      <div class="kline"><span style="color:var(--mu)">Cần/ngày</span><span class="kv" style="color:${runRate>avgPerDay?'var(--da)':'var(--su)'}">${fmt(runRate)}</span></div>`;
+  } else {
+    const chName = activeCh==='Tiktok'?'TikTok':activeCh;
+    lbl5.textContent=chName+' — KPI';
+    const chGMV = rows.reduce((s,r)=>s+r.gmv,0);
+    const mKey = {Shopee:'shopeeTarget',Facebook:'fbTarget',Tiktok:'tiktokTarget',Event:'eventTarget',Website:'webTarget'};
+    const chTgt = D.monthly?.[mKey[activeCh]]||0;
+    const fp = chTgt>0?chGMV/chTgt*100:0;
+    val5.textContent=fmt(chGMV); val5.style.color='var(--br)';
+    sub5.innerHTML=chTgt>0?`<span class="pill ${pillClass(fp)}">${fp.toFixed(1)}% target</span>`:`<span class="pill pn">No Target</span>`;
+    det5.innerHTML=chTgt>0?`<div class="kline"><span style="color:var(--mu)">Target</span><span class="kv">${fmt(chTgt)}</span></div><div class="kline"><span style="color:var(--mu)">Gap</span><span class="kv" style="color:var(--da)">${fmt(Math.max(0,chTgt-chGMV))}</span></div>`:
+      `<div style="font-size:10px;color:var(--mu)">Chưa có target tháng này</div>`;
   }
 }
 
-/* ── CANCEL / RETURN PANEL ── */
-function renderCancelPanel() {
-  const spRows = filterByDate(D.shopee);
-  const el = document.getElementById('cancel-panel');
-  if(!spRows.length){el.innerHTML='<div style="font-size:10px;color:var(--mu)">Không có dữ liệu Shopee trong khoảng này.</div>';return;}
-  const tGMV = spRows.reduce((s,r)=>s+r.gmv,0)||1;
-  const tOrd = spRows.reduce((s,r)=>s+r.orders,0)||1;
-  const cancelGMV = spRows.reduce((s,r)=>s+(r.cancelGmv||0),0);
-  const cancelOrd = spRows.reduce((s,r)=>s+(r.cancelOrder||0),0);
-  const returnGMV = spRows.reduce((s,r)=>s+(r.returnGmv||0),0);
-  const returnOrd = spRows.reduce((s,r)=>s+(r.returnOrder||0),0);
-  const cancelRate = (cancelGMV/tGMV*100).toFixed(1);
-  const returnRate = (returnGMV/tGMV*100).toFixed(1);
-  const cancelOrdRate = (cancelOrd/tOrd*100).toFixed(1);
-  const returnOrdRate = (returnOrd/tOrd*100).toFixed(1);
-  el.innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-      <div class="mini-stat">
-        <div class="ms-lbl">Tỉ lệ hủy (GMV)</div>
-        <div class="ms-val" style="color:${parseFloat(cancelRate)>10?'var(--da)':'var(--wa)'}">${cancelRate}%</div>
-        <div style="font-size:8px;color:var(--mu)">${fmt(cancelGMV)}</div>
-      </div>
-      <div class="mini-stat">
-        <div class="ms-lbl">Tỉ lệ hủy (đơn)</div>
-        <div class="ms-val" style="color:${parseFloat(cancelOrdRate)>10?'var(--da)':'var(--wa)'}">${cancelOrdRate}%</div>
-        <div style="font-size:8px;color:var(--mu)">${cancelOrd} đơn</div>
-      </div>
-      <div class="mini-stat">
-        <div class="ms-lbl">Tỉ lệ hoàn (GMV)</div>
-        <div class="ms-val" style="color:${parseFloat(returnRate)>5?'var(--da)':'var(--su)'}">${returnRate}%</div>
-        <div style="font-size:8px;color:var(--mu)">${fmt(returnGMV)}</div>
-      </div>
-      <div class="mini-stat">
-        <div class="ms-lbl">Tỉ lệ hoàn (đơn)</div>
-        <div class="ms-val" style="color:${parseFloat(returnOrdRate)>5?'var(--da)':'var(--su)'}">${returnOrdRate}%</div>
-        <div style="font-size:8px;color:var(--mu)">${returnOrd} đơn</div>
-      </div>
-    </div>
-    <div style="font-size:8px;color:var(--mu);margin-top:5px;padding:3px 6px;background:var(--bg);border-radius:4px">Chỉ tính cho kênh Shopee · Tỉ lệ hủy >10% = cảnh báo đỏ</div>`;
+function renderAlerts(p, tGMV, tTgt, cirVal, crVal, traffic, orders){
+  let html='';
+  if(p<80) html+=alertBox('pr','🔴','GMV '+p.toFixed(1)+'% target','Dưới ngưỡng an toàn 80%');
+  if(activeCh==='Facebook' && cirVal!=='—' && parseFloat(cirVal)>30)
+    html+=alertBox('pr','🔴','CIR Facebook '+cirVal,'Hiệu quả ads đang giảm');
+  if(traffic>0 && orders/traffic*100<1)
+    html+=alertBox('pw','🟡','CR thấp — có dấu hiệu nghẽn chuyển đổi','Cần kiểm tra landing page & inbox');
+  const spRows = filterCh('Shopee');
+  const cancelRate = spRows.reduce((s,r)=>s+(r.cancelGmv||0),0) / (spRows.reduce((s,r)=>s+r.gmv,0)||1);
+  if(cancelRate>0.1) html+=alertBox('pw','🟡','Cancel rate Shopee: '+(cancelRate*100).toFixed(1)+'%','Vượt ngưỡng 10%');
+  const top5 = SKU.slice(0,5).reduce((s,r)=>s+r.gmv_all,0);
+  const allG  = SKU.reduce((s,r)=>s+r.gmv_all,0)||1;
+  if(top5/allG>0.6) html+=alertBox('pw','🟡','Top 5 SKU chiếm '+(top5/allG*100).toFixed(1)+'%','Phụ thuộc nhiều vào hero SKU');
+  if(!html) html=alertBox('pg','✅','Không có cảnh báo nghiêm trọng','Tất cả chỉ số trong ngưỡng cho phép');
+  document.getElementById('alerts-panel').innerHTML=html;
+}
+function alertBox(cls,icon,title,desc){
+  return `<div style="background:var(--${cls.replace('p','')+'-bg'||'bg'});border-radius:7px;padding:7px 9px;margin-bottom:5px;border-left:3px solid">
+    <div style="font-size:9px;font-weight:700;color:var(--${cls==='pg'?'su':cls==='pw'?'wa':'da'})">${icon} ${title}</div>
+    <div style="font-size:9px;color:var(--mu)">${desc}</div>
+  </div>`.replace('border-left:3px solid','border-left:3px solid var(--'+(cls==='pg'?'su':cls==='pw'?'wa':'da')+')');
 }
 
-/* ── INSIGHTS ── */
-function renderInsights(gmv,p,sp,fb,tt,ev,tot){
-  let h=`<div class="isec" style="color:var(--su);margin-top:0">Tích cực</div>`;
-  if(activeCh==='all'){
-    if(sp>fb) h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Shopee chiếm ${pct(sp,tot)} GMV — organic mạnh</div></div>`;
-    if(ev>0) h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">Event offline đóng góp ${pct(ev,tot)} — kênh B2B đang hoạt động</div></div>`;
-  }
-  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">AOV Facebook cao nhất — khách có giá trị đơn tốt</div></div>`;
-  if(activeCh==='Tiktok') h+=`<div class="ir"><div class="id" style="background:var(--su)"></div><div class="it">TikTok CR cao nhất khi có livestream — nhân rộng</div></div>`;
-  h+=`<div class="isec" style="color:var(--da)">Rủi ro</div>`;
-  if(p<80) h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">GMV ${p.toFixed(1)}% target — dưới ngưỡng 80%</div></div>`;
-  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--da)"></div><div class="it">Kiểm tra CIR — >30% nhiều ngày cho thấy ads kém hiệu quả</div></div>`;
-  if(activeCh==='all'&&tt/tot<0.1) h+=`<div class="ir"><div class="id" style="background:var(--wa)"></div><div class="it">TikTok chỉ ${pct(tt,tot)} GMV — kênh chưa khai thác hết</div></div>`;
-  h+=`<div class="isec" style="color:var(--br)">Hành động</div>`;
-  if(activeCh==='Facebook') h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Pause nhóm ads CIR >30%, tập trung ngày AOV cao</div></div>`;
-  else if(activeCh==='Tiktok') h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Livestream đều đặn — nhân mô hình ngày có CR cao</div></div>`;
-  else h+=`<div class="ir"><div class="id" style="background:var(--br)"></div><div class="it">Flash sale Shopee cuối tháng — push top SKU</div></div>`;
-  document.getElementById('insights-panel').innerHTML=h;
-}
-
-/* ── CHARTS ── */
-function initCharts(){
-  donutChart=new Chart(document.getElementById('dc'),{
+/* ══════════════════════════════════════════
+   CHARTS
+══════════════════════════════════════════ */
+function initAllCharts(){
+  // Donut
+  CHARTS.donut = new Chart(document.getElementById('dc'),{
     type:'doughnut',
-    data:{labels:['Shopee','Facebook','TikTok','Event'],datasets:[{data:[0,0,0,0],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'],borderWidth:0,hoverOffset:3}]},
-    options:{responsive:true,maintainAspectRatio:true,cutout:'70%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,c.dataset.data.reduce((a,b)=>a+b,0))}}}}
+    data:{labels:['Shopee','Facebook','TikTok','Event','Website'],
+          datasets:[{data:[0,0,0,0,0],backgroundColor:Object.values(CH_COLORS),borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,cutout:'68%',
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,c.dataset.data.reduce((a,b)=>a+b,0))}}}}
   });
-  lineChart=new Chart(document.getElementById('lc'),{
+  // Line GMV vs Target
+  CHARTS.line = new Chart(document.getElementById('lc'),{
     type:'line',
     data:{labels:[],datasets:[
-      {label:'GMV',data:[],borderColor:'#D99A7A',backgroundColor:'rgba(217,154,122,0.1)',fill:true,tension:0.35,pointRadius:2,borderWidth:2},
+      {label:'GMV',data:[],borderColor:'#D99A7A',backgroundColor:'rgba(217,154,122,0.1)',fill:true,tension:.35,pointRadius:2,borderWidth:2},
       {label:'Target',data:[],borderColor:'#C8A882',backgroundColor:'transparent',tension:0,pointRadius:0,borderWidth:1.5,borderDash:[4,4]}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}}}}
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>c.dataset.label+': '+fmt(c.parsed.y)}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},
+              y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}}}}
   });
-  barChart=new Chart(document.getElementById('bc'),{
+  // Bar orders
+  CHARTS.bar = new Chart(document.getElementById('bc'),{
     type:'bar',
     data:{labels:[],datasets:[{label:'Đơn',data:[],backgroundColor:[],borderRadius:3,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' đơn'}}},
-      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}}}}
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+' đơn'}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:15}},
+              y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}}}}
   });
 }
 
-/* ── INIT DASHBOARD ── */
-function initDashboard(){
-  initCharts();
-  buildMonthSelector();
-  applyFilters();
+function updateCharts(labels, gmvs, tgts, ords, tGMV){
+  // Line
+  CHARTS.line.data.labels=labels; CHARTS.line.data.datasets[0].data=gmvs; CHARTS.line.data.datasets[1].data=tgts; CHARTS.line.update();
+  // Bar
+  CHARTS.bar.data.labels=labels; CHARTS.bar.data.datasets[0].data=ords;
+  CHARTS.bar.data.datasets[0].backgroundColor=ords.map(v=>v>=30?'#6B4F3F':v>=20?'#D99A7A':'#EAD8C0'); CHARTS.bar.update();
+  // Donut
+  const spT=filterCh('Shopee').reduce((s,r)=>s+r.gmv,0);
+  const fbT=filterCh('Facebook').reduce((s,r)=>s+r.gmv,0);
+  const ttT=filterCh('Tiktok').reduce((s,r)=>s+r.gmv,0);
+  const evT=filterCh('Event').reduce((s,r)=>s+r.gmv,0);
+  const wbT=filterCh('Website').reduce((s,r)=>s+r.gmv,0);
+  const chVals=[spT,fbT,ttT,evT,wbT];
+  const chTot=chVals.reduce((a,b)=>a+b,0)||1;
+  CHARTS.donut.data.datasets[0].data=chVals; CHARTS.donut.update();
+  // Legend
+  document.getElementById('donut-leg').innerHTML=
+    ['Shopee','Facebook','TikTok','Event','Website'].map((n,i)=>{
+      const v=chVals[i]; if(!v) return '';
+      return `<div class="leg"><div class="ld" style="background:${Object.values(CH_COLORS)[i]}"></div><span style="flex:1">${n}</span><b>${pct(v,chTot)}</b></div>`;
+    }).join('');
 }
 
-/* ── TABS ── */
-function switchTab(t,btn){
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('act'));
-  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
-  btn.classList.add('act');document.getElementById('tab-'+t).classList.add('act');
-  if(t==='sku') initSkuTab();
+/* ══════════════════════════════════════════
+   CHANNEL TAB
+══════════════════════════════════════════ */
+function updateChannelTab(){
+  const grid = document.getElementById('channel-cards-grid');
+  const channels = [
+    {key:'Shopee',   color:CH_COLORS.Shopee,   tgtKey:'shopeeTarget'},
+    {key:'Facebook', color:CH_COLORS.Facebook,  tgtKey:'fbTarget'},
+    {key:'Tiktok',   color:CH_COLORS.Tiktok,    tgtKey:'tiktokTarget'},
+    {key:'Event',    color:CH_COLORS.Event,      tgtKey:'eventTarget'},
+    {key:'Website',  color:CH_COLORS.Website,    tgtKey:'webTarget'},
+  ];
+  grid.innerHTML = channels.map(ch=>{
+    const rows = filterCh(ch.key);
+    const synced = (CH[ch.key]||{}).synced;
+    const gmv  = rows.reduce((s,r)=>s+r.gmv,0);
+    const ord  = rows.reduce((s,r)=>s+(r.ord||0),0);
+    const aov  = ord>0?Math.round(gmv/ord):0;
+    const tgt  = D.monthly?.[ch.tgtKey]||0;
+    const ach  = tgt>0?gmv/tgt*100:0;
+    const traffic = rows.reduce((s,r)=>s+(r.visitor||r.leads||0),0);
+    const ads  = rows.reduce((s,r)=>s+(r.ads||0),0);
+    const cir  = gmv>0&&ads>0?(ads/gmv*100).toFixed(1):'—';
+    const cr   = traffic>0&&ord>0?(ord/traffic*100).toFixed(2)+'%':'—';
+    const name = ch.key==='Tiktok'?'TikTok':ch.key;
+    const all5 = channels.map(c=>filterCh(c.key).reduce((s,r)=>s+r.gmv,0));
+    const grandTotal = all5.reduce((a,b)=>a+b,0)||1;
+    const contrib = (gmv/grandTotal*100).toFixed(1)+'%';
+    if(!synced){
+      return `<div class="ch-card">
+        <div class="ch-card-header"><div class="ch-dot" style="background:${ch.color}"></div>
+          <div class="ch-name">${name}</div>
+          <span class="ch-status awaiting">Awaiting Sync</span></div>
+        <div style="font-size:10px;color:var(--mu);padding:10px 0">Chưa có dữ liệu trong khoảng này.</div>
+      </div>`;
+    }
+    return `<div class="ch-card">
+      <div class="ch-card-header"><div class="ch-dot" style="background:${ch.color}"></div>
+        <div class="ch-name">${name}</div>
+        <span class="ch-status synced">✓ Synced</span></div>
+      <div class="ch-metrics">
+        <div class="ch-metric"><div class="cml">GMV</div><div class="cmv">${fmt(gmv)}</div></div>
+        <div class="ch-metric"><div class="cml">Orders</div><div class="cmv">${fmtN(ord)}</div></div>
+        <div class="ch-metric"><div class="cml">AOV</div><div class="cmv">${fmt(aov)}</div></div>
+        <div class="ch-metric"><div class="cml">Traffic/Leads</div><div class="cmv">${fmtN(traffic)}</div></div>
+        <div class="ch-metric"><div class="cml">CR%</div><div class="cmv">${cr}</div></div>
+        <div class="ch-metric"><div class="cml">CIR%</div><div class="cmv">${cir==='—'?'—':cir+'%'}</div></div>
+        <div class="ch-metric"><div class="cml">Contribution</div><div class="cmv">${contrib}</div></div>
+        <div class="ch-metric"><div class="cml">Achievement</div><div class="cmv ${ach>0?(ach>=80?'':''):''}">${tgt>0?ach.toFixed(1)+'%':'—'}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Stacked bar
+  buildStackedBar();
+  buildSOGDonut();
 }
 
-/* ── SKU TAB ── */
+function buildStackedBar(){
+  const allDates=[...new Set([...filterCh('Shopee'),...filterCh('Facebook'),...filterCh('Tiktok'),...filterCh('Event'),...filterCh('Website')].map(r=>r.d))].sort();
+  const labels=allDates.map(d=>lbl(d));
+  const chKeys=['Shopee','Facebook','Tiktok','Event','Website'];
+  const chLabels=['Shopee','Facebook','TikTok','Event','Website'];
+  const datasets=chKeys.map((k,i)=>{
+    const map={}; filterCh(k).forEach(r=>{map[r.d]=r.gmv;});
+    return {label:chLabels[i],data:allDates.map(d=>map[d]||0),backgroundColor:Object.values(CH_COLORS)[i],borderWidth:0};
+  });
+  if(CHARTS.stacked){ CHARTS.stacked.data.labels=labels; CHARTS.stacked.data.datasets=datasets; CHARTS.stacked.update(); return; }
+  CHARTS.stacked=new Chart(document.getElementById('ch-stacked'),{
+    type:'bar',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{font:{size:9}}}},
+      scales:{x:{stacked:true,grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:12}},
+              y:{stacked:true,grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}}}}
+  });
+}
+
+function buildSOGDonut(){
+  const spRows = filterCh('Shopee');
+  const shopTab = spRows.reduce((s,r)=>s+(r.shopTab||0),0);
+  const total   = spRows.reduce((s,r)=>s+r.gmv,0)||1;
+  const organic = shopTab;
+  const other   = Math.max(0, total-organic);
+  const ttRows  = filterCh('Tiktok');
+  const live    = ttRows.reduce((s,r)=>s+(r.live||0),0);
+  const video   = ttRows.reduce((s,r)=>s+(r.video||0),0);
+  const fbRows  = filterCh('Facebook');
+  const paid    = fbRows.reduce((s,r)=>s+(r.ads||0),0);
+  const sogData=[organic,live,video,paid,other].map(v=>Math.max(0,v));
+  const sogLabels=['Shop Tab (Organic)','TikTok Live','TikTok Video','FB Paid','Others'];
+  const sogColors=['#D99A7A','#F3C6B8','#EAD8C0','#6B4F3F','#C8A882'];
+  const sogTotal=sogData.reduce((a,b)=>a+b,0)||1;
+  if(CHARTS.sog){ CHARTS.sog.data.datasets[0].data=sogData; CHARTS.sog.update(); }
+  else {
+    CHARTS.sog=new Chart(document.getElementById('sog-donut'),{
+      type:'doughnut',data:{labels:sogLabels,datasets:[{data:sogData,backgroundColor:sogColors,borderWidth:0,hoverOffset:3}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,sogTotal)}}}}
+    });
+  }
+  document.getElementById('sog-leg').innerHTML=sogLabels.map((n,i)=>{
+    if(!sogData[i]) return '';
+    return `<div class="leg"><div class="ld" style="background:${sogColors[i]}"></div><span style="flex:1">${n}</span><b>${pct(sogData[i],sogTotal)}</b></div>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   SKU TAB
+══════════════════════════════════════════ */
 function initSkuTab(){
-  if(skuInit)return;skuInit=true;
-  const s1=document.getElementById('sel-c'),s2=document.getElementById('sel-s');
-  s1.innerHTML='<option value="all">Tất cả sản phẩm</option>';
-  s2.innerHTML='<option value="all">Tất cả sản phẩm</option>';
-  SKU.forEach(s=>{s1.innerHTML+=`<option value="${s.name}">${s.name}</option>`;s2.innerHTML+=`<option value="${s.name}">${s.name}</option>`;});
+  if(skuInit) return; skuInit=true;
+  const s1=document.getElementById('sel-c'), s2=document.getElementById('sel-s');
+  s1.innerHTML='<option value="all">Tất cả</option>';
+  s2.innerHTML='<option value="all">Tất cả</option>';
+  SKU.forEach(s=>{ s1.innerHTML+=`<option value="${s.name}">${s.name}</option>`; s2.innerHTML+=`<option value="${s.name}">${s.name}</option>`; });
 
   // Gender donut
   const gMap={Girl:0,Boy:0,Unisex:0};
-  SKU.forEach(s=>{if(s.gender)Object.entries(s.gender).forEach(([k,v])=>{if(gMap[k]!==undefined)gMap[k]+=v;});});
+  SKU.forEach(s=>{ if(s.gender) Object.entries(s.gender).forEach(([k,v])=>{ if(gMap[k]!==undefined) gMap[k]+=v; }); });
   const gTot=Object.values(gMap).reduce((a,b)=>a+b,0)||1;
-  genderChart=new Chart(document.getElementById('gc'),{
-    type:'doughnut',
-    data:{labels:['Bé gái','Bé trai','Unisex'],datasets:[{data:[gMap.Girl,gMap.Boy,gMap.Unisex],backgroundColor:['#D99A7A','#6B4F3F','#EAD8C0'],borderWidth:0,hoverOffset:3}]},
+  CHARTS.gender=new Chart(document.getElementById('gc'),{
+    type:'doughnut',data:{labels:['Bé gái','Bé trai','Unisex'],datasets:[{data:[gMap.Girl,gMap.Boy,gMap.Unisex],backgroundColor:['#D99A7A','#6B4F3F','#EAD8C0'],borderWidth:0,hoverOffset:3}]},
     options:{responsive:true,maintainAspectRatio:true,cutout:'65%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>' '+pct(c.parsed,gTot)+' · '+fmt(c.parsed)}}}}
   });
   document.getElementById('gender-leg').innerHTML=['Bé gái','Bé trai','Unisex'].map((n,i)=>
     `<div class="leg"><div class="ld" style="background:${['#D99A7A','#6B4F3F','#EAD8C0'][i]}"></div><span style="flex:1">${n}</span><b>${pct([gMap.Girl,gMap.Boy,gMap.Unisex][i],gTot)}</b></div>`
   ).join('')+`<div style="margin-top:5px;font-size:9px;color:var(--mu)">Tổng: ${fmt(gTot)}</div>`;
 
-  // Channel bar — dùng monthly actuals
+  // Channel horizontal bar
   const m=D.monthly||{};
-  const spA=m.shopeeActual||0,fbA=m.fbActual||0,ttA=m.tiktokActual||0,evA=m.eventActual||0;
-  chBarChart=new Chart(document.getElementById('chb'),{
-    type:'bar',
-    data:{labels:['Shopee','Facebook','TikTok','Event'],datasets:[{data:[spA,fbA,ttA,evA],backgroundColor:['#D99A7A','#6B4F3F','#F3C6B8','#8B7355'],borderRadius:4,borderSkipped:false}]},
-    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x)+' ('+pct(c.parsed.x,spA+fbA+ttA+evA)+')'}}},
+  const ch_vals=[m.shopeeActual||0,m.fbActual||0,m.tiktokActual||0,m.eventActual||0,m.webActual||0];
+  const ch_tot=ch_vals.reduce((a,b)=>a+b,0)||1;
+  CHARTS.chbar=new Chart(document.getElementById('chb'),{
+    type:'bar',data:{labels:['Shopee','Facebook','TikTok','Event','Website'],datasets:[{data:ch_vals,backgroundColor:Object.values(CH_COLORS),borderRadius:4,borderSkipped:false}]},
+    options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.x)+' ('+pct(c.parsed.x,ch_tot)+')'}}},
       scales:{x:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E',callback:v=>fmt(v)}},y:{grid:{display:false},ticks:{font:{size:10},color:'#3A2A20'}}}}
   });
-  renderSku();renderColor();renderSize();
+
+  renderSkuKPIs();
+  renderSkuList();
+  renderSkuCombo();
+  renderSkuDailyTrend();
+  renderColor();
+  renderSize();
 }
 
-function renderSku(){
+function renderSkuKPIs(){
+  const totalUnits=Object.values(SKU_DAILY).reduce((a,b)=>a+b,0);
+  const tOrd=(D.daily||[]).filter(r=>r.date>=fromDate&&r.date<=toDate).reduce((s,r)=>s+r.orders,0);
+  const top5GMV=SKU.slice(0,5).reduce((s,r)=>s+r.gmv_all,0);
+  const allGMV=SKU.reduce((s,r)=>s+r.gmv_all,0)||1;
+  setText('sku-units',fmtN(totalUnits));
+  setText('sku-upo',tOrd>0?(totalUnits/tOrd).toFixed(1):'—');
+  setText('sku-top5',pct(top5GMV,allGMV));
+  setText('sku-count',String(SKU.filter(s=>s.gmv_all>0).length));
+}
+
+function renderSkuList(){
   const ch=document.getElementById('sku-ch').value;
   const sorted=[...SKU].sort((a,b)=>(b.gmv_ch?.[ch]||b.gmv_all)-(a.gmv_ch?.[ch]||a.gmv_all));
   const tot=sorted.reduce((s,r)=>s+(r.gmv_ch?.[ch]||r.gmv_all),0)||1;
   const max=(sorted[0]?.gmv_ch?.[ch]||sorted[0]?.gmv_all)||1;
   document.getElementById('sku-list').innerHTML=sorted.slice(0,12).map((s,i)=>{
     const v=s.gmv_ch?.[ch]||s.gmv_all;
-    return`<div class="sr"><span style="font-size:9px;color:var(--mu);min-width:14px;font-weight:700">${i+1}</span><span class="sn">${s.name}</span><div class="st2"><div class="sf2" style="width:${Math.round(v/max*100)}%"></div></div><span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`;
+    return`<div class="sr"><span style="font-size:9px;color:var(--mu);min-width:16px;font-weight:700">${i+1}</span>
+      <span class="sn">${s.name}</span>
+      <div class="st"><div class="sf" style="width:${Math.round(v/max*100)}%"></div></div>
+      <span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`;
   }).join('');
 }
+
+function renderSkuCombo(){
+  const top5=SKU.slice(0,5);
+  const others=SKU.slice(5).reduce((s,r)=>s+r.gmv_all,0);
+  const allGMV=SKU.reduce((s,r)=>s+r.gmv_all,0)||1;
+  const labels=[...top5.map(s=>s.name.substring(0,18)+'…'),'Others'];
+  const units=[...top5.map(s=>s.qty_all||0), SKU.slice(5).reduce((s,r)=>s+(r.qty_all||0),0)];
+  const gmvPct=[...top5.map(s=>(s.gmv_all/allGMV*100)),others/allGMV*100];
+  if(CHARTS.skuCombo){ CHARTS.skuCombo.data.labels=labels; CHARTS.skuCombo.data.datasets[0].data=units; CHARTS.skuCombo.data.datasets[1].data=gmvPct; CHARTS.skuCombo.update(); return; }
+  CHARTS.skuCombo=new Chart(document.getElementById('sku-combo'),{
+    type:'bar',
+    data:{labels,datasets:[
+      {label:'Units',data:units,backgroundColor:'#D99A7A',borderRadius:4,borderSkipped:false,yAxisID:'y'},
+      {label:'GMV %',data:gmvPct,type:'line',borderColor:'#6B4F3F',backgroundColor:'transparent',pointRadius:3,borderWidth:2,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,labels:{font:{size:9}}}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:30}},
+              y:{position:'left',grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}},
+              y1:{position:'right',grid:{display:false},ticks:{font:{size:8},color:'#6B4F3F',callback:v=>v.toFixed(1)+'%'}}}}
+  });
+}
+
+function renderSkuDailyTrend(){
+  const dates=Object.keys(SKU_DAILY).filter(d=>d>=fromDate&&d<=toDate).sort();
+  const vals=dates.map(d=>SKU_DAILY[d]||0);
+  const labels=dates.map(d=>lbl(d));
+  if(CHARTS.skuDaily){ CHARTS.skuDaily.data.labels=labels; CHARTS.skuDaily.data.datasets[0].data=vals; CHARTS.skuDaily.update(); return; }
+  CHARTS.skuDaily=new Chart(document.getElementById('sku-daily'),{
+    type:'line',data:{labels,datasets:[{label:'Units',data:vals,borderColor:'#D99A7A',backgroundColor:'rgba(217,154,122,0.15)',fill:true,tension:.35,pointRadius:2,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{grid:{display:false},ticks:{font:{size:8},color:'#9C7C6E',maxRotation:45,autoSkip:true,maxTicksLimit:12}},
+              y:{grid:{color:'rgba(234,216,192,0.4)'},ticks:{font:{size:8},color:'#9C7C6E'}}}}
+  });
+}
+
 function renderBars(id,obj){
   const entries=Object.entries(obj).sort((a,b)=>b[1]-a[1]);
-  const tot=entries.reduce((s,[,v])=>s+v,0)||1,max=entries[0]?.[1]||1;
+  const tot=entries.reduce((s,[,v])=>s+v,0)||1; const max=entries[0]?.[1]||1;
   document.getElementById(id).innerHTML=entries.map(([k,v],i)=>
-    `<div class="sr"><div style="width:8px;height:8px;border-radius:2px;background:${CP[i%CP.length]};flex-shrink:0"></div><span class="sn">${k}</span><div class="st2" style="width:55px"><div class="sf2" style="width:${Math.round(v/max*100)}%;background:${CP[i%CP.length]}"></div></div><span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`
+    `<div class="sr"><div style="width:8px;height:8px;border-radius:2px;background:${CP[i%CP.length]};flex-shrink:0"></div>
+     <span class="sn">${k}</span><div class="st" style="width:55px"><div class="sf" style="width:${Math.round(v/max*100)}%;background:${CP[i%CP.length]}"></div></div>
+     <span class="sv">${fmt(v)}</span><span class="sp2">${pct(v,tot)}</span></div>`
   ).join('');
 }
 function renderColor(){const sel=document.getElementById('sel-c').value;let d={};if(sel==='all')SKU.forEach(s=>Object.entries(s.colors||{}).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU.find(s=>s.name===sel);if(f)d=f.colors||{};}renderBars('color-list',d);}
 function renderSize(){const sel=document.getElementById('sel-s').value;let d={};if(sel==='all')SKU.forEach(s=>Object.entries(s.sizes||{}).forEach(([k,v])=>{d[k]=(d[k]||0)+v;}));else{const f=SKU.find(s=>s.name===sel);if(f)d=f.sizes||{};}renderBars('size-list',d);}
 
-/* ── START ── */
+/* ══════════════════════════════════════════
+   INSIGHT ENGINE
+══════════════════════════════════════════ */
+function updateInsights(){
+  const rows=getRows();
+  const tGMV=rows.reduce((s,r)=>s+r.gmv,0);
+  const tOrd=rows.reduce((s,r)=>s+(r.ord||0),0);
+  const tTgt=rows.reduce((s,r)=>s+r.tgt,0);
+  const p=tTgt>0?tGMV/tTgt*100:0;
+
+  const spT=filterCh('Shopee').reduce((s,r)=>s+r.gmv,0);
+  const fbT=filterCh('Facebook').reduce((s,r)=>s+r.gmv,0);
+  const ttT=filterCh('Tiktok').reduce((s,r)=>s+r.gmv,0);
+  const evT=filterCh('Event').reduce((s,r)=>s+r.gmv,0);
+  const wbT=filterCh('Website').reduce((s,r)=>s+r.gmv,0);
+  const grandT=spT+fbT+ttT+evT+wbT||1;
+
+  const top5GMV=SKU.slice(0,5).reduce((s,r)=>s+r.gmv_all,0);
+  const allGMV=SKU.reduce((s,r)=>s+r.gmv_all,0)||1;
+  const top5Pct=top5GMV/allGMV*100;
+
+  const spRows=filterCh('Shopee');
+  const newCust=spRows.reduce((s,r)=>s+(r.newCust||0),0);
+  const oldCust=spRows.reduce((s,r)=>s+(r.oldCust||0),0);
+  const retPct=oldCust/(newCust+oldCust||1)*100;
+
+  const totalUnits=Object.entries(SKU_DAILY).filter(([d])=>d>=fromDate&&d<=toDate).reduce((s,[,v])=>s+v,0);
+  const upo=tOrd>0?totalUnits/tOrd:0;
+
+  const fbRows=filterCh('Facebook');
+  const ads=fbRows.reduce((s,r)=>s+(r.ads||0),0);
+  const cir=fbT>0&&ads>0?ads/fbT*100:0;
+
+  const [fy,fm]=fromDate.split('-').map(Number);
+  const daysInMonth=new Date(fy,fm,0).getDate();
+  const activeDays=rows.filter(r=>r.gmv>0).length||1;
+  const forecast=tGMV/activeDays*daysInMonth;
+  const mTgt=D.monthly?.totalTarget||tTgt||1;
+  const forecastGap=mTgt-forecast;
+
+  // ── TÍCH CỰC ──
+  const pos=[];
+  const topCh=[{n:'Shopee',v:spT},{n:'Facebook',v:fbT},{n:'TikTok',v:ttT},{n:'Event',v:evT},{n:'Website',v:wbT}].sort((a,b)=>b.v-a.v)[0];
+  if(topCh.v/grandT>0.4) pos.push(`<b>${topCh.n}</b> chiếm <b>${(topCh.v/grandT*100).toFixed(0)}%</b> GMV — là kênh đóng góp chính.`);
+  if(spT/grandT>0.3) pos.push('Shopee organic (Shop Tab) đang đóng góp tốt — kênh hiệu quả không cần ads.');
+  const peakDay=rows.reduce((m,r)=>r.gmv>m.gmv?r:m,{gmv:0});
+  if(peakDay.gmv) pos.push(`Ngày cao nhất: <b>${peakDay.lb}</b> đạt <b>${fmt(peakDay.gmv)}</b> GMV — cần phân tích trigger.`);
+  if(upo>1.5) pos.push(`Units/Order = <b>${upo.toFixed(1)}</b> — cross-sell và bundle đang hoạt động hiệu quả.`);
+  if(evT>0) pos.push(`Event offline đóng góp <b>${(evT/grandT*100).toFixed(1)}%</b> — kênh B2B đang hoạt động.`);
+  if(!CH.Website.synced===false && wbT>0) pos.push(`Website đóng góp <b>${(wbT/grandT*100).toFixed(1)}%</b> GMV.`);
+
+  // ── RỦI RO ──
+  const risk=[];
+  if(p<80) risk.push(`GMV mới đạt <b>${p.toFixed(1)}%</b> target — dưới ngưỡng an toàn 80%.`);
+  if(forecastGap>0) risk.push(`Forecast EOM còn thiếu <b>${fmt(forecastGap)}</b> so với target.`);
+  ['Shopee','Facebook','Tiktok','Website'].forEach(ch=>{
+    if(!(CH[ch]||{}).synced) risk.push(`<b>${ch==='Tiktok'?'TikTok':ch}</b> đang Awaiting Sync — chưa đủ dữ liệu đánh giá.`);
+  });
+  if(cir>30) risk.push(`CIR Facebook <b>${cir.toFixed(1)}%</b> — chi phí ads vượt ngưỡng an toàn 30%.`);
+  if(upo<1.2&&upo>0) risk.push(`Units/Order = <b>${upo.toFixed(1)}</b> — basket size thấp, khách mua ít sản phẩm/đơn.`);
+  if(retPct<20&&(newCust+oldCust)>0) risk.push(`Khách quay lại chỉ <b>${retPct.toFixed(1)}%</b> — tỷ trọng thấp, cần CRM.`);
+  if(top5Pct>60) risk.push(`Top 5 SKU chiếm <b>${top5Pct.toFixed(1)}%</b> GMV — phụ thuộc nhiều vào hero SKU.`);
+  if(top5Pct<30&&SKU.length>0) risk.push(`Top 5 SKU chỉ <b>${top5Pct.toFixed(1)}%</b> GMV — chưa có SKU chủ lực rõ ràng.`);
+
+  // ── HÀNH ĐỘNG ──
+  const act=[];
+  if(p<80){
+    const runRate=daysInMonth-activeDays>0?Math.round((mTgt-tGMV)/(daysInMonth-activeDays)):0;
+    act.push(`Cần <b>${fmt(runRate)}/ngày</b> trong <b>${daysInMonth-activeDays}</b> ngày còn lại để đạt target. Recovery plan: flash sale + push bundle.`);
+  }
+  if(spT/grandT>0.4) act.push('Shopee là kênh chính: kích hoạt <b>Flash Sale</b>, push top SKU, tăng voucher theo AOV ngưỡng.');
+  if(fbT/grandT<0.1&&CH.Facebook.synced) act.push('Facebook contribution thấp: <b>audit creative</b>, kiểm tra targeting, refresh inbox script, chạy retargeting.');
+  if(ttT/grandT<0.05&&CH.Tiktok.synced) act.push('TikTok contribution thấp: kiểm tra tracking, <b>tăng lịch live</b>, content seeding top SKU.');
+  if(!CH.Website.synced) act.push('Website chưa sync data: kết nối <b>Daily Report_Website</b> để theo dõi hiệu quả.');
+  if(retPct<20&&(newCust+oldCust)>0) act.push('Khách quay lại thấp: thiết lập <b>CRM remarketing</b> qua Zalo/SMS, offer cho khách cũ.');
+  if(upo<1.2&&upo>0) act.push('Basket size thấp: đẩy <b>combo/bundle/cross-sell</b> — gợi ý thêm sản phẩm khi checkout.');
+
+  const renderIns=(items,color)=>items.length?items.map(t=>`<div class="ir"><div class="id" style="background:${color}"></div><div class="it">${t}</div></div>`).join(''):'<div style="font-size:10px;color:var(--mu)">Không có nhận định trong khoảng này.</div>';
+
+  document.getElementById('ins-pos').innerHTML=renderIns(pos,'var(--su)');
+  document.getElementById('ins-risk').innerHTML=renderIns(risk,'var(--da)');
+  document.getElementById('ins-act').innerHTML=renderIns(act,'var(--br)');
+}
+
+/* ══════════════════════════════════════════
+   TABS
+══════════════════════════════════════════ */
+function switchTab(t, btn){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('act'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('act'));
+  btn.classList.add('act');
+  document.getElementById('tab-'+t).classList.add('act');
+  if(t==='sku') initSkuTab();
+  if(t==='channel') updateChannelTab();
+  if(t==='insight') updateInsights();
+}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+
+/* ══════════════════════════════════════════
+   START
+══════════════════════════════════════════ */
 loadData();
 </script>
 </body>
